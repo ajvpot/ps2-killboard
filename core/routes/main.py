@@ -29,3 +29,7 @@ def dumpcache():
 def lookup(name):
 	name = name.lower()
 	return requests.get("https://census.daybreakgames.com/s:vanderpot/get/ps2:v2/character/?name.first_lower=%s&c:show=character_id" % name).json()['character_list'][0]['character_id']
+
+@app.route('/kpm')
+def kpm():
+	return render_template('kpm.html')

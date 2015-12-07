@@ -59,6 +59,7 @@ class PS2RealTimeClientProtocol(WebSocketClientProtocol):
 						'id': characterid,
 						'data': data
 					}))
+					return (characterid,data)
 
 				attacker['deferred'].addCallback(_fix)
 				del attacker['deferred']
@@ -84,6 +85,7 @@ class PS2RealTimeClientProtocol(WebSocketClientProtocol):
 						'id': characterid,
 						'data': data
 					}))
+					return (characterid,data)
 
 				character['deferred'].addCallback(_fix)
 				del character['deferred']
@@ -96,6 +98,7 @@ class PS2RealTimeClientProtocol(WebSocketClientProtocol):
 						'id': characterid,
 						'data': data
 					}))
+					return (characterid,data)
 
 				attacker['deferred'].addCallback(_fix)
 				del attacker['deferred']
