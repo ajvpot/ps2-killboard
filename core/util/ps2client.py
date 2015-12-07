@@ -37,7 +37,7 @@ class PS2RealTimeClientProtocol(WebSocketClientProtocol):
 
 		payload = payload['payload']
 
-		if app.config['PS2_FILTER_ENABLE']:
+		if(app.config['PS2_FILTER_ENABLE']):
 			try:
 				if int(payload['attacker_character_id']) not in app.config['PS2_INTERESTED_IDS'] and int(payload['character_id']) not in app.config['PS2_INTERESTED_IDS']:
 					#log.msg("Not interested in this message", system="census")
@@ -47,8 +47,13 @@ class PS2RealTimeClientProtocol(WebSocketClientProtocol):
 			except Exception as e:
 				log.msg("Failed to parse a thing %s" % e, system="census")
 
+		# TODO: Refactor messages into objects with fetch methods for things that need to be resolved
+
+		for x in self.factory.listeners:
+			x.onMessage(payload)
+
 		#print payload['event_name']
-		if payload['event_name'] == "VehicleDestroy":
+		if(payload['event_name'] == "VehicleDestroy"):
 			attacker = cache.get('character', payload['attacker_character_id'])
 
 			if(not attacker['resolved']):
@@ -73,7 +78,7 @@ class PS2RealTimeClientProtocol(WebSocketClientProtocol):
 				'faction': cache.get('faction', payload['faction_id']),
 				'seq': self.counter
 			}))
-		elif payload['event_name'] == "Death":
+		elif(payload['event_name'] == "Death"):
 			character = cache.get('character', payload['character_id'])
 			attacker = cache.get('character', payload['attacker_character_id'])
 
