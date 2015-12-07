@@ -1,4 +1,3 @@
-
 from autobahn.twisted.websocket import WebSocketClientProtocol, \
 	WebSocketClientFactory
 from core.util.websocket import wsFactory
@@ -10,8 +9,10 @@ import json
 from core import app
 from twisted.python import log
 from core.util.ps2cache import cache
-class MyClientProtocol(WebSocketClientProtocol):
+
+class PS2RealTimeClientProtocol(WebSocketClientProtocol):
 	counter = 0
+
 	def onConnect(self, response):
 		print("Server connected: {0}".format(response.peer))
 
@@ -23,15 +24,19 @@ class MyClientProtocol(WebSocketClientProtocol):
 									 'action': 'subscribe',
 									 'characters': ['all'],
 									 'eventNames': ['Death', 'VehicleDestroy']}))
+
 		self.factory.receiver.ps2api = self
 
 	def onMessage(self, payload, isBinary):
 		self.counter += 1
 		#self.factory.receiver.broadcast(payload)
+
 		try:
 			payload = json.loads(payload)
+
 			if payload['type'] != 'serviceMessage':
 				return
+
 			payload = payload['payload']
 
 			if app.config['PS2_FILTER_ENABLE']:
@@ -43,7 +48,6 @@ class MyClientProtocol(WebSocketClientProtocol):
 						log.msg("Interested in this message", system="census")
 				except Exception as e:
 					log.msg("Failed to parse a thing %s" % e, system="census")
-
 
 			#print payload['event_name']
 			if payload['event_name'] == "VehicleDestroy":
@@ -71,12 +75,3 @@ class MyClientProtocol(WebSocketClientProtocol):
 
 	def onClose(self, wasClean, code, reason):
 		print("WebSocket connection closed: {0}".format(reason))
-
-
-factory = WebSocketClientFactory(u"wss://push.planetside2.com/streaming?environment=ps2&service-id=s:vanderpot", debug=True)
-factory.protocol = MyClientProtocol
-factory.receiver = wsFactory
-
-contextFactory = ssl.ClientContextFactory()
-
-connectWS(factory, contextFactory)

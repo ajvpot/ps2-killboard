@@ -10,7 +10,7 @@ app.config['APP_PATH'] = os.path.abspath(os.path.join(os.path.dirname(os.path.ab
 app.config['APP_PORT'] = 8080
 # app.config['SERVER_NAME'] = ''
 
-app.config['PS2_FILTER_ENABLE'] = True
+app.config['PS2_FILTER_ENABLE'] = False
 app.config['PS2_INTERESTED_IDS'] = [5428392193625290673, 5428308138483718321, 5428308138483717921, 5428401268685703233, 5428297992006952913]
 
 app.config['PS2_QUERY_INTERVAL'] = 2

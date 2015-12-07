@@ -15,7 +15,7 @@ from core.util.websocket import wsFactory
 HTTPClientFactory.noisy = False
 
 
-app.debug = False
+app.debug = True
 app.testing = False
 
 if __name__ == '__main__':
@@ -23,6 +23,7 @@ if __name__ == '__main__':
 	if app.debug:
 		from werkzeug.debug import DebuggedApplication
 		app.wsgi_app = DebuggedApplication(app.wsgi_app, True)
+
 	# Wrap reverse proxy
 	app.wsgi_app = ReverseProxied(app.wsgi_app)
 
@@ -49,7 +50,9 @@ if __name__ == '__main__':
 	site = Site(rootResource)
 	reactor.listenTCP(app.config['APP_PORT'], site, interface="0.0.0.0")
 
-	import core.util.ps2client
-	import core.util.ps2cache
+	import core.startup
+	core.startup.startup()
+	# import core.util.ps2client
+	# import core.util.ps2cache
 
 	reactor.run()
