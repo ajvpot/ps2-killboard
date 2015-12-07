@@ -8,6 +8,7 @@ class KPMListener(object):
 			'tr': 0,
 			'nc': 0,
 			'vs': 0,
+			'ns': 0,
 		}
 
 		l = LoopingCall(self.status)
@@ -32,7 +33,7 @@ class KPMListener(object):
 				character['deferred'].addCallback(_fix)
 				waiting.append(character['deferred'])
 
-			if(not attacker['resolved'])    :
+			if(not attacker['resolved']):
 				def _fix(data):
 					results[1] = data[1]
 
