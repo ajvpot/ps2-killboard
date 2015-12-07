@@ -9,7 +9,6 @@ from twisted.web.client import HTTPClientFactory
 from autobahn.twisted.websocket import WebSocketServerFactory, \
 	WebSocketServerProtocol
 from autobahn.twisted.resource import WebSocketResource, WSGIRootResource
-from core.util.websocket import wsFactory
 
 # disable httpclientfactory noise
 HTTPClientFactory.noisy = False
@@ -32,10 +31,13 @@ if __name__ == '__main__':
 	log.startLogging(sys.stdout)
 	log.msg('Starting app')
 
+	import core.startup
+	core.startup.startup()
+
 	##
 	# create a Twisted Web resource for our WebSocket server
 	##
-	wsResource = WebSocketResource(wsFactory)
+	wsResource = WebSocketResource(core.startup.wsFactory)
 
 	##
 	# create a Twisted Web WSGI resource for our Flask server
@@ -50,8 +52,6 @@ if __name__ == '__main__':
 	site = Site(rootResource)
 	reactor.listenTCP(app.config['APP_PORT'], site, interface="0.0.0.0")
 
-	import core.startup
-	core.startup.startup()
 	# import core.util.ps2client
 	# import core.util.ps2cache
 

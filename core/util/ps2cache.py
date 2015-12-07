@@ -1,6 +1,6 @@
 from collections import defaultdict
 from twisted.python import log
-from twisted.internet.defer import inlineCallbacks
+from twisted.internet.defer import inlineCallbacks, Deferred
 import json
 from twisted.internet import reactor
 from twisted.internet.task import LoopingCall
@@ -10,89 +10,122 @@ from sys import getsizeof, stderr
 from itertools import chain
 from collections import deque
 from core import app
+
 try:
 	from reprlib import repr
 except ImportError:
 	pass
 
-class CharacterResolver(object):
-	queue = []
+_debugging = False
 
-	def __init__(self):
-		log.msg("Initialized resolver", system="resolve")
-		self.resolveRunner()
+class CharacterResolver(object):
+	def __init__(self, query_interval, batch_max=200):
+		# map of character_id: [list of deferreds for people waiting on id information]
+		self.queue = {}
+		self.batch_max = batch_max
+
+		# RETARDED CIRCULAR REFERENCE LOL todo
+		self.cache = None
+
+		self.loop = LoopingCall(self.resolveRunner)
+		self.loop.start(query_interval)
+
+	def stop(self):
+		self.loop.stop()
 
 	def resolveRunner(self):
-		if len(self.queue) == 0:
-			reactor.callLater(app.config['PS2_QUERY_INTERVAL'], self.resolveRunner)
+		if(len(self.queue) == 0):
 			return
 
-		# remove dupes
-		self.queue = list(set(self.queue))
-		log.msg("Resolving %s character IDs" % len(self.queue), system="resolve")
-		url = 'https://census.daybreakgames.com/s:vanderpot/get/ps2:v2/character/?character_id=%s&c:show=name.first,character_id,battle_rank.value,faction_id&c:resolve=outfit' % ','.join(self.queue)
+		if(_debugging):
+			log.msg("Resolving %s character IDs" % len(self.queue), system="resolve")
+
+		q = self.queue.keys()[0:self.batch_max]
+
+		url = 'https://census.daybreakgames.com/s:vanderpot/get/ps2:v2/character/?character_id=%s&c:show=name.first,character_id,battle_rank.value,faction_id&c:resolve=outfit' % ','.join(q)
 		d = getPage(str(url))
 		d.noisy = False
-		self.queue = []
 
 		def parseResolve(resp):
-			#print resp
-			list = json.loads(resp)['character_list']
-			for character in list:
-				try:
-					disp = {'name': character['name']['first'],
-							'id': character['character_id'],
-							'br': character['battle_rank']['value'],
-							'faction': cache.get('faction', character['faction_id']),
-							'disp': '%s (%s)' % (character['name']['first'], character['battle_rank']['value']),
-							'resolved': True}
-					if 'outfit' in character.keys():
-						disp['tag'] = character['outfit']['alias']
-						disp['disp'] = "[%s] %s" % (disp['tag'], disp['disp'])
+			l = json.loads(resp)['character_list']
 
-					self._broadcastResolve(character['character_id'], disp)
-				except Exception as e:
-					print "failed to broadcast, ", e
-			reactor.callLater(app.config['PS2_QUERY_INTERVAL'], self.resolveRunner)
+			for character in l:
+				disp = {
+					'name': character['name']['first'],
+					'id': character['character_id'],
+					'br': character['battle_rank']['value'],
+					# RETARDED CIRCULAR REFERENCE LOL todo
+					'faction': self.cache.get('faction', character['faction_id']),
+					'disp': '%s (%s)' % (character['name']['first'], character['battle_rank']['value']),
+					'resolved': True
+				}
+
+				if 'outfit' in character.keys():
+					disp['tag'] = character['outfit']['alias']
+					disp['disp'] = "[%s] %s" % (disp['tag'], disp['disp'])
+
+				for d in self.queue[character['character_id']]:
+					d.callback((character['character_id'], disp))
+
+				del self.queue[character['character_id']]
 
 		def printErr(err):
-			print "in resolverunner, ",err
-			reactor.callLater(app.config['PS2_QUERY_INTERVAL'], self.resolveRunner)
+			log.msg("ERR: in resolverunner, %r" % (err))
+			#reactor.stop()
 
 		d.addCallback(parseResolve)
 		d.addErrback(printErr)
 
 	def _broadcastResolve(self, id, val):
-		wsFactory.broadcast(json.dumps({
-			'type': 'resolve',
-			'id': id,
-			'data': val
-		}))
+		for d in self.queue[id]:
+			d.callback(val)
 
-		cache.set('character', id, val) # ToDo: make this cache value a dict? resolve empire, br
+		del self.queue[id]
+
+		# wsFactory.broadcast(json.dumps({
+		# 	'type': 'resolve',
+		# 	'id': id,
+		# 	'data': val
+		# }))
+
+		# cache.set('character', id, val) # ToDo: make this cache value a dict? resolve empire, br
 
 	def resolve(self, characterid):
-		cache.set('character', characterid, None)
-		self.queue.append(characterid)
+		# cache.set('character', characterid, None)
+		d = Deferred()
 
-resolver = CharacterResolver()
+		if(characterid in self.queue):
+			self.queue[characterid].append(d)
+		else:
+			self.queue[characterid] = [d]
+
+		return d
 
 class PS2Cache(object):
 	cache = defaultdict(dict)
 	hit = 0
 	miss = 0
 
-	def __init__(self):
-		log.msg("Initialized cache", system="cache")
-		lc = LoopingCall(self._statusReport)
-		lc.start(15)
+	def __init__(self, resolver):
+		if(_debugging):
+			log.msg("Initialized cache", system="cache")
+
+		self.resolver = resolver
+		# RETARDED CIRCULAR REFERENCE LOL todo
+		self.resolver.cache = self
+
+		if(_debugging):
+			lc = LoopingCall(self._statusReport)
+			lc.start(15)
 
 	def _statusReport(self):
 		count = 0
+
 		for dict in self.cache.values():
 			count += len(dict.keys())
 
-		log.msg('Cache contains %s keys, %s hit %s miss' % (count, self.hit, self.miss), system="cache")
+		if(_debugging):
+			log.msg('Cache contains %s keys, %s hit %s miss' % (count, self.hit, self.miss), system="cache")
 
 	def get(self, type, key):
 		if type == "character":
@@ -101,78 +134,89 @@ class PS2Cache(object):
 
 				return self.cache[type][key]
 			else:
-				resolver.resolve(key)
+				def _fix(data):
+					self.set('character', *data) #characterid, data
+					return data
+
+				d = self.resolver.resolve(key)
+				d.addCallback(_fix)
 				self.miss += 1
 
-				return {'resolved': False, 'name': key}
+				return {'resolved': False, 'name': key, 'deferred': d}
 		else:
 			if key in self.cache[type].keys():
 				self.hit += 1
+
 				return self.cache[type][key]
 			else:
 				self.miss += 1
-				log.msg("CACHE MISS: [%s]%s" % (type, key), system="cache")
+
+				if(_debugging):
+					log.msg("CACHE MISS: [%s]%s" % (type, key), system="cache")
 
 				return "CACHE MISS: key(%s)" % key # ToDo: Fix this
 
 	def set(self, type, key, value):
 		self.cache[type][key] = value
 
+	# this is semi-retarded, yolo
+	def populate(self):
+		if(_debugging):
+			log.msg("Populating item cache", system="cache")
 
-cache = PS2Cache()
+		self.set('item', '0', 'Suicide')
+		d = getPage('https://census.daybreakgames.com/s:vanderpot/get/ps2:v2/item?item_type_id=26&c:limit=1000000&c:show=name.en,item_id')
 
-#populate cache
+		def loadWeapons(resp):
+			list = json.loads(resp)
+			list = list['item_list']
 
-log.msg("Populating item cache", system="cache")
-cache.set('item', '0', 'Suicide')
-d = getPage('https://census.daybreakgames.com/s:vanderpot/get/ps2:v2/item?item_type_id=26&c:limit=1000000&c:show=name.en,item_id')
+			for item in list:
+				try:
+					self.set('item', item['item_id'], item['name']['en'])
+				except:
+					pass
 
-def loadWeapons(resp):
-	list = json.loads(resp)
-	list = list['item_list']
+			if(_debugging):
+				log.msg("Item cache populated", system="cache")
 
-	for item in list:
-		try:
-			cache.set('item', item['item_id'], item['name']['en'])
-		except:
-			pass
+		def printErr(err):
+			print err
 
-	log.msg("Item cache populated", system="cache")
+		d.addCallback(loadWeapons)
+		d.addErrback(printErr)
 
-def printErr(err):
-	print err
+		if(_debugging):
+			log.msg("Populating vehicle cache", system="cache")
 
-d.addCallback(loadWeapons)
-d.addErrback(printErr)
+		d = getPage('https://census.daybreakgames.com/s:vanderpot/get/ps2:v2/vehicle?c:show=vehicle_id,name.en&c:limit=100000')
 
-log.msg("Populating vehicle cache", system="cache")
-d = getPage('https://census.daybreakgames.com/s:vanderpot/get/ps2:v2/vehicle?c:show=vehicle_id,name.en&c:limit=100000')
+		def loadWeapons(resp):
+			list = json.loads(resp)
+			list = list['vehicle_list']
 
-def loadWeapons(resp):
-	list = json.loads(resp)
-	list = list['vehicle_list']
+			for vehicle in list:
+				try:
+					self.set('vehicle', vehicle['vehicle_id'], vehicle['name']['en'])
+				except:
+					pass
 
-	for vehicle in list:
-		try:
-			cache.set('vehicle', vehicle['vehicle_id'], vehicle['name']['en'])
-		except:
-			pass
+			if(_debugging):
+				log.msg("Vehicle cache populated", system="cache")
 
-	log.msg("Vehicle cache populated", system="cache")
+		def printErr(err):
+			print err
 
-def printErr(err):
-	print err
+		d.addCallback(loadWeapons)
+		d.addErrback(printErr)
 
-d.addCallback(loadWeapons)
-d.addErrback(printErr)
+		self.set('faction', '2', 'nc')
+		self.set('faction', '3', 'tr')
+		self.set('faction', '1', 'vs')
 
-cache.set('faction', '2', 'nc')
-cache.set('faction', '3', 'tr')
-cache.set('faction', '1', 'vs')
-
-cache.set('character', '0', {'name': 'Unknown',
-							'id': 0,
-							'br': 0,
-							'faction': 'ns',
-							'disp': 'Unknown',
-							'resolved': True})
+		self.set('character', '0', {'name': 'Unknown',
+									'id': 0,
+									'br': 0,
+									'faction': 'ns',
+									'disp': 'Unknown',
+									'resolved': True})
