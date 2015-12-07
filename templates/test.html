@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <style>
+        .nc{
+            color: #0080FF;
+        }
+         .tr{
+            color: #D90005;
+        }
+        .vs{
+            color: #92009D;
+        }
+        td{
+            color: #ffffff;
+            background-color: #151515;
+        }
+        .vehicle{
+            background-color: #ffffff;
+            color: #000000;
+        }
+        .loading{
+            color:#505050;
+            background-image: url(static/ajax-loader.gif);
+            background-repeat: no-repeat;
+            background-size: contain;
+        }
+    </style>
+    <script type="text/javascript">
+        var sock = null;
+        var ellog = null;
+        window.onload = function() {
+            ellog = document.getElementById('log');
+            setInterval(function(){ellog.innerHTML=ellog.innerHTML.substring(ellog.innerHTML.length-10000,ellog.innerHTML.length); ellog.scrollTop = ellog.scrollHeight;}, 1000)
+            var wsuri;
+            if (window.location.protocol === "file:") {
+                wsuri = "ws://127.0.0.1:8080/ws";
+            } else {
+                wsuri = "ws://" + window.location.hostname + ":8080/ws";
+            }
+            if ("WebSocket" in window) {
+                sock = new WebSocket(wsuri);
+            } else if ("MozWebSocket" in window) {
+                sock = new MozWebSocket(wsuri);
+            } else {
+                log("Browser does not support WebSocket!");
+                window.location = "http://autobahn.ws/unsupportedbrowser";
+            }
+            if (sock) {
+                sock.onopen = function() {
+                    log("Connected to " + wsuri);
+                }
+                sock.onclose = function(e) {
+                    log("Connection closed (wasClean = " + e.wasClean + ", code = " + e.code + ", reason = '" + e.reason + "')");
+                    sock = null;
+                }
+                sock.onmessage = function(e) {
+                    $("#killfeed tr:gt(50)").remove();
+                    log("< " + e.data);
+                    data = JSON.parse(e.data);
+                    if(data['type'] == "parsed"){
+                        if(data['event_name'] == "Death"){
+                            html = '<tr id=event'+data['seq']+'>'
+                           if(data['attacker']['resolved']==true){
+                                console.log('resolved user');
+                                html += '<td class="'+data['attacker']['faction']+'">'+ data['attacker']['disp'] +'</td>';
+                            }else{
+                                html += '<td class="loading">'+ data['attacker']['name'] +'</td>';
+                            }
+                            if(data['character']['resolved']==true){
+                                html += '<td class="'+data['character']['faction']+'">'+ data['character']['disp'] +'</td>';
+                            }else{
+                                html += '<td class="loading">'+ data['character']['name'] +'</td>';
+                            }
+
+                            html += '<td>'+ data['attacker_weapon'] +'</td></tr>';
+
+                            $('#killfeed tr:nth-child(2)').before(html);
+                            // resolve attacker
+                            // resolve attacked
+                        }
+                        if(data['event_name'] == "VehicleDestroy"){
+                            html = '<tr id=event'+data['seq']+'>'
+                            if(data['attacker']['resolved']==true){
+                                html += '<td class="'+data['attacker']['faction']+'">'+ data['attacker']['disp'] +'</td>';
+                            }else{
+                                html += '<td>'+ data['attacker']['name'] +'</td>';
+                            }
+                            html += '<td class="vehicle">'+ data['vehicle'] +'</td>';
+                            html += '<td>'+ data['attacker_weapon'] +'</td></tr>';
+
+                            $('#killfeed tr:nth-child(2)').before(html);
+                            // resolve attacker
+                        }
+                    }else if(data['type'] == "resolve"){
+                        console.log(data);
+                        $("td").filter(function() {
+                            return $(this).text() == data['id'];
+                        }).text(data['data']['disp']).addClass(data['data']['faction']).removeClass('loading');
+                    }
+
+
+                }
+            }
+        };
+        function resolveCharacter(){
+
+        }
+        function send() {
+            var msg = document.getElementById('message').value;
+            if (sock) {
+                sock.send(msg);
+                log("> " + msg);
+            } else {
+                log("Not connected.");
+            }
+        };
+        function log(m) {
+            ellog.innerHTML += m + '\n';
+            ellog.scrollTop = ellog.scrollHeight;
+        };
+    </script>
+</head>
+<body>
+<h1>BIG DATA WEBSOCKET TEST PAGE</h1>
+<noscript>You must enable JavaScript</noscript>
+<div style="overflow:hidden; width:750px;">
+<table id="killfeed">
+<tr>
+    <th style="width:250px;">Attacker</th>
+    <th style="width:250px;">Attacked</th>
+    <th style="width:250px;">Weapon</th>
+</tr>
+<tr></tr>
+</table>
+</div>
+<form>
+    <p>Message: <input id="message" type="text" size="50" value="Hello, world!"></p>
+</form>
+<button onclick='send();'>Send Message</button>
+<pre id="log" style="height: 20em; overflow-y: scroll; background-color: #faa;"></pre>
+
+</body>
+</html>
