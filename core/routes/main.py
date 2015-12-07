@@ -13,13 +13,9 @@ from core.ps2data import cache
 def index():
 	return render_template('index.html')
 
-@app.route('/test')
-def test():
-	return render_template('test.html')
-
-@app.route('/test2')
-def test2():
-	return render_template('test2.html')
+@app.route('/feed')
+def feed():
+	return render_template('feed.html')
 
 @app.route('/dumpcache')
 def dumpcache():
