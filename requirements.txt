@@ -2,7 +2,4 @@ flask
 flask-sqlalchemy
 flask-login
 sqlalchemy
-python-instagram
-flask_uploads
-flask_wtf
 flask_admin
