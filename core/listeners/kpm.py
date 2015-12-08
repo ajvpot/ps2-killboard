@@ -66,7 +66,7 @@ class KPMListener(object):
 		self.started = time.time()
 
 		l = LoopingCall(self.status)
-		l.start(5.0)
+		l.start(5.0, False)
 
 	# returns true if we haven't had over an hour of stats yet
 	def inaccurate(self):

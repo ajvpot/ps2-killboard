@@ -58,7 +58,7 @@ class GroupKillListener(object):
 		self.started = time.time()
 
 		l = LoopingCall(self.status)
-		l.start(5.0)
+		#l.start(5.0)
 
 	def status(self):
 		log.msg(repr(self.tracker.groupkills), system="GroupKillListener")

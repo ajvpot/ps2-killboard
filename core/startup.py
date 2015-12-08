@@ -4,6 +4,7 @@ from twisted.internet import ssl
 from core import app
 from core.listeners.kpm import KPMListener
 from core.listeners.groupkill import GroupKillListener
+from core.listeners.simpleevent import SimpleEventListener
 from core.util.ps2client import PS2RealTimeClientProtocol
 from core.util.websocket import KillboardServerFactory, KillboardProtocol
 
@@ -29,6 +30,7 @@ def startup():
 	factory.listeners = {
 		'kpm': KPMListener(),
 		'groupkill': GroupKillListener(),
+		'simpleevent': SimpleEventListener(),
 	}
 	factory.protocol = PS2RealTimeClientProtocol
 	factory.receiver = wsFactory

@@ -22,7 +22,7 @@ class PS2RealTimeClientProtocol(WebSocketClientProtocol):
 		self.sendMessage(json.dumps({'service': 'event',
 									 'action': 'subscribe',
 									 'characters': ['all'],
-									 'eventNames': ['Death', 'VehicleDestroy']}))
+									 'eventNames': ['Death', 'VehicleDestroy', 'GainExperience']}))
 
 		self.factory.receiver.ps2api = self
 

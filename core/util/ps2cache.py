@@ -210,6 +210,30 @@ class PS2Cache(object):
 		d.addCallback(loadWeapons)
 		d.addErrback(printErr)
 
+		if(_debugging):
+			log.msg("Populating experience", system="cache")
+
+		d = getPage('https://census.daybreakgames.com/s:vanderpot/get/ps2:v2/experience?c:limit=1000')
+
+		def loadExperience(resp):
+			list = json.loads(resp)
+			list = list['experience_list']
+
+			for event in list:
+				try:
+					self.set('experience', event['experience_id'], event['description'])
+				except:
+					pass
+
+			if(_debugging):
+				log.msg("Experience cache populated", system="cache")
+
+		def printErr(err):
+			print err
+
+		d.addCallback(loadExperience)
+		d.addErrback(printErr)
+
 		self.set('faction', '2', 'nc')
 		self.set('faction', '3', 'tr')
 		self.set('faction', '1', 'vs')
