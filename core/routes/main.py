@@ -37,6 +37,11 @@ def groupkill(top=10):
 	kt = startup.factory.listeners['groupkill']
 	return render_template('groupkill.html', kt=kt, cache=cache, top=top)
 
+@app.route('/event')
+@app.route('/event/')
+def eventlist():
+	return render_template('experiencelist.html', cache=cache)
+
 @app.route('/event/<string:event>')
 @app.route('/event/<string:event>/<int:top>')
 def simpleevent(event, top=10):
