@@ -1,6 +1,7 @@
 import time
 from twisted.internet.defer import DeferredList
 from core.ps2data import cache
+from twisted.python import log
 
 esf_ids = ('7','8','9')
 
@@ -15,16 +16,16 @@ class ESFReservation(object):
 
 	def mark(self, characterid):
 		if(not characterid in self.reserve):
-			print '%s ESF Added (%s wtf) => %s' % (self.name, self.wtf, characterid)
+			log.msg('%s ESF Added   (%s wtf) => %s' % (self.name, self.wtf, characterid), system="esfcounter")
 			self.reserve.append(characterid)
 
 	def remove(self, characterid, wtf=True):
 		if(characterid in self.reserve):
 			self.reserve.remove(characterid)
-			print '%s ESF Removed (%s wtf) => %s' % (self.name, self.wtf, characterid)
+			log.msg('%s ESF Removed (%s wtf) => %s' % (self.name, self.wtf, characterid), system="esfcounter")
 		elif(wtf):
 			self.wtf += 1
-			print 'WTFFFF!?!?!?!?! %s' % (characterid)
+			log.msg('%s ESF WTF!!!! (%s wtf) => %s' % (self.name, self.wtf, characterid), system="esfcounter")
 
 	def __repr__(self):
 		return '%s ESFs, %s wtf' % (len(self.reserve), self.wtf)
