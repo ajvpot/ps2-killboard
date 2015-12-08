@@ -1,119 +1,118 @@
 {% extends "layout.html" %}
 {% block include %}
-{{ super() }}
-<script type="text/javascript">
-	var sock = null;
-	var ellog = null;
-	window.onload = function() {
-		ellog = document.getElementById('log');
-		var wsuri;
-		if (window.location.protocol === "file:") {
-			wsuri = "ws://127.0.0.1:8080/ws";
-		} else {
-			wsuri = "ws://" + window.location.hostname + ":8080/ws";
-		}
-		if ("WebSocket" in window) {
-			sock = new WebSocket(wsuri);
-		} else if ("MozWebSocket" in window) {
-			sock = new MozWebSocket(wsuri);
-		} else {
-			log("Browser does not support WebSocket!");
-			window.location = "http://autobahn.ws/unsupportedbrowser";
-		}
-		if (sock) {
-			sock.onopen = function() {
-				log("Connected to " + wsuri);
+	{{ super() }}
+	<script type="text/javascript">
+		var sock = null;
+		var ellog = null;
+		window.onload = function() {
+			ellog = document.getElementById('log');
+			var wsuri;
+			if (window.location.protocol === "file:") {
+				wsuri = "ws://127.0.0.1:8080/ws";
+			} else {
+				wsuri = "ws://" + window.location.hostname + ":8080/ws";
 			}
-			sock.onclose = function(e) {
-				log("Connection closed (wasClean = " + e.wasClean + ", code = " + e.code + ", reason = '" + e.reason + "')");
-				sock = null;
+			if ("WebSocket" in window) {
+				sock = new WebSocket(wsuri);
+			} else if ("MozWebSocket" in window) {
+				sock = new MozWebSocket(wsuri);
+			} else {
+				log("Browser does not support WebSocket!");
+				window.location = "http://autobahn.ws/unsupportedbrowser";
 			}
-			sock.onmessage = function(e) {
-
-				log("< " + e.data);
-				data = JSON.parse(e.data);
-				if(data['type'] == "parsed"){
-					if(data['event_name'] == "Death"){
-						html = '<tr id=event'+data['seq']+'>'
-						if(data['attacker']['resolved']==true){
-							html += '<td class="'+data['attacker']['faction']+'">'+ data['attacker']['disp'] +'</td>';
-						}else{
-							html += '<td class="loading">'+ data['attacker']['name'] +'</td>';
-						}
-						if(data['character']['resolved']==true){
-							html += '<td class="'+data['character']['faction']+'">'+ data['character']['disp'] +'</td>';
-						}else{
-							html += '<td class="loading">'+ data['character']['name'] +'</td>';
-						}
-
-						html += '<td>'+ data['attacker_weapon'] +'</td></tr>';
-
-						$('#killfeed tr:nth-child(2)').before(html);
-						// resolve attacker
-						// resolve attacked
-					}
-					if(data['event_name'] == "VehicleDestroy"){
-						html = '<tr id=event'+data['seq']+'>'
-						if(data['attacker']['resolved']==true){
-							html += '<td class="'+data['attacker']['faction']+'">'+ data['attacker']['disp'] +'</td>';
-						}else{
-							html += '<td>'+ data['attacker']['name'] +'</td>';
-						}
-						html += '<td class="vehicle '+data['faction']+'">'+ data['vehicle'] +'</td>';
-						html += '<td>'+ data['attacker_weapon'] +'</td></tr>';
-
-						$('#killfeed tr:nth-child(2)').before(html);
-						// resolve attacker
-					}
-				}else if(data['type'] == "resolve"){
-					$("td").filter(function() {
-						return $(this).text() == data['id'];
-					}).text(data['data']['disp']).addClass(data['data']['faction']).removeClass('loading');
-				}else if(data['type'] == "status"){
-					 html = '<tr>';
-					html += '<td colspan=3>';
-					html += data['msg'];
-					html += '</td></tr>';
-					$('#killfeed tr:nth-child(2)').before(html);
-                    if (data['msg'] == "* Playback complete"){
-                        $('#killfeed').show();
-                        $('#loader').hide();
-                    }
+			if (sock) {
+				sock.onopen = function() {
+					log("Connected to " + wsuri);
 				}
+				sock.onclose = function(e) {
+					log("Connection closed (wasClean = " + e.wasClean + ", code = " + e.code + ", reason = '" + e.reason + "')");
+					sock = null;
+				}
+				sock.onmessage = function(e) {
 
-				$("#killfeed tr:gt(50)").remove();
+					log("< " + e.data);
+					data = JSON.parse(e.data);
+					if(data['type'] == "parsed"){
+						if(data['event_name'] == "Death"){
+							html = '<tr id=event'+data['seq']+'>'
+							if(data['attacker']['resolved']==true){
+								html += '<td class="'+data['attacker']['faction']+'">'+ data['attacker']['disp'] +'</td>';
+							}else{
+								html += '<td class="loading">'+ data['attacker']['name'] +'</td>';
+							}
+							if(data['character']['resolved']==true){
+								html += '<td class="'+data['character']['faction']+'">'+ data['character']['disp'] +'</td>';
+							}else{
+								html += '<td class="loading">'+ data['character']['name'] +'</td>';
+							}
+
+							html += '<td>'+ data['attacker_weapon'] +'</td></tr>';
+
+							$('#killfeed tr:nth-child(2)').before(html);
+							// resolve attacker
+							// resolve attacked
+						}
+						if(data['event_name'] == "VehicleDestroy"){
+							html = '<tr id=event'+data['seq']+'>'
+							if(data['attacker']['resolved']==true){
+								html += '<td class="'+data['attacker']['faction']+'">'+ data['attacker']['disp'] +'</td>';
+							}else{
+								html += '<td>'+ data['attacker']['name'] +'</td>';
+							}
+							html += '<td class="vehicle '+data['faction']+'">'+ data['vehicle'] +'</td>';
+							html += '<td>'+ data['attacker_weapon'] +'</td></tr>';
+
+							$('#killfeed tr:nth-child(2)').before(html);
+							// resolve attacker
+						}
+					}else if(data['type'] == "resolve"){
+						$("td").filter(function() {
+							return $(this).text() == data['id'];
+						}).text(data['data']['disp']).addClass(data['data']['faction']).removeClass('loading');
+					}else if(data['type'] == "status"){
+						html = '<tr>';
+						html += '<td colspan=3>';
+						html += data['msg'];
+						html += '</td></tr>';
+						$('#killfeed tr:nth-child(2)').before(html);
+						if (data['msg'] == "* Playback complete"){
+							$('#killfeed').show();
+							$('#loader').hide();
+						}
+					}
+
+					$("#killfeed tr:gt(50)").remove();
+				}
 			}
-		}
-	};
-	function resolveCharacter(){
+		};
+		function resolveCharacter(){
 
-	}
-	function send() {
-		var msg = document.getElementById('message').value;
-		if (sock) {
-			sock.send(msg);
-			log("> " + msg);
-		} else {
-			log("Not connected.");
 		}
-	};
-	function log(m) {
-		console.log(m);
-        return;
-		ellog.innerHTML += m + '\n';
-		ellog.innerHTML=ellog.innerHTML.substring(ellog.innerHTML.length-10000,ellog.innerHTML.length);
-		ellog.scrollTop = ellog.scrollHeight;
-
-	};
-</script>
+		function send() {
+			var msg = document.getElementById('message').value;
+			if (sock) {
+				sock.send(msg);
+				log("> " + msg);
+			} else {
+				log("Not connected.");
+			}
+		};
+		function log(m) {
+			console.log(m);
+			return;
+			ellog.innerHTML += m + '\n';
+			ellog.innerHTML=ellog.innerHTML.substring(ellog.innerHTML.length-10000,ellog.innerHTML.length);
+			ellog.scrollTop = ellog.scrollHeight;
+		};
+	</script>
 {% endblock %}
 
 {% block content %}
 	<div class="row">
 		<div class="col-md-12">
-            <div id="loader" style="text-align: center;">
-                <h1>Loading</h1>
-            </div>
+			<div id="loader" style="text-align: center;">
+				<h1>Loading</h1>
+			</div>
 			<table id="killfeed" class="table" style="display: none;">
 				<tr>
 					<th >Attacker</th>
