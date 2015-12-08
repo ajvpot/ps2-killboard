@@ -75,6 +75,10 @@
 					html += data['msg'];
 					html += '</td></tr>';
 					$('#killfeed tr:nth-child(2)').before(html);
+                    if (data['msg'] == "* Playback complete"){
+                        $('#killfeed').show();
+                        $('#loader').hide();
+                    }
 				}
 
 				$("#killfeed tr:gt(50)").remove();
@@ -94,7 +98,8 @@
 		}
 	};
 	function log(m) {
-		return;
+		console.log(m);
+        return;
 		ellog.innerHTML += m + '\n';
 		ellog.innerHTML=ellog.innerHTML.substring(ellog.innerHTML.length-10000,ellog.innerHTML.length);
 		ellog.scrollTop = ellog.scrollHeight;
@@ -106,7 +111,10 @@
 {% block content %}
 	<div class="row">
 		<div class="col-md-12">
-			<table id="killfeed" class="table">
+            <div id="loader" style="text-align: center;">
+                <h1>Loading</h1>
+            </div>
+			<table id="killfeed" class="table" style="display: none;">
 				<tr>
 					<th >Attacker</th>
 					<th>Attacked</th>
@@ -114,12 +122,6 @@
 				</tr>
 				<tr></tr>
 			</table>
-		</div>
-	</div>
-
-	<div class="row">
-		<div clas="col-md-12">
-			<pre id="log" style="height: 20em; overflow-y: scroll; background-color: #faa;"></pre>
 		</div>
 	</div>
 {% endblock %}
