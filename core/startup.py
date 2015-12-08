@@ -40,7 +40,7 @@ def startup():
 		'esfkpm': KPMListener(filter=lambda payload, character, attacker: payload['attacker_vehicle_id'] in ('7','8','9')),
 		'kpm': KPMListener(),
 		'groupkill': GroupKillListener(),
-		'simpleevent': SimpleEventListener(),
+		#'simpleevent': SimpleEventListener(),
 		'loginresolver': LoginResolverListener(),
 	}
 	factory.protocol = PS2RealTimeClientProtocol
