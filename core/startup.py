@@ -25,9 +25,9 @@ def startup():
 	factory = WebSocketClientFactory(u"wss://push.planetside2.com/streaming?environment=ps2&service-id=s:vanderpot", debug=True)
 	# set up modules wanting to listen to the ps2 datastream
 	# TODO: refactor websocket crap for live killfeed into a listener
-	factory.listeners = [
-		KPMListener()
-	]
+	factory.listeners = {
+		'kpm': KPMListener(),
+	}
 	factory.protocol = PS2RealTimeClientProtocol
 	factory.receiver = wsFactory
 

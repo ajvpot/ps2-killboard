@@ -28,4 +28,5 @@ def lookup(name):
 
 @app.route('/kpm')
 def kpm():
-	return render_template('kpm.html')
+	kt = startup.factory.listeners['kpm']
+	return render_template('kpm.html', kt=kt, inaccurate=kt.inaccurate())

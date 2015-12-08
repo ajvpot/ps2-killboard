@@ -6,23 +6,34 @@
 		</div>
 	</div>
 
+    {% if inaccurate %}
+    <div class="row">
+        <div class="col-md-12 well">
+            WARNING: This page has not collected at least one hour of kill statistics yet, so the kill per minute statistic is likely inaccurate.
+        </div>
+    </div>
+    {% endif %}
+
 	<div class="row" style="text-align: center">
 		<div class="col-md-4">
 			<div class="well kpm vs">
 				<h1>VS</h1>
-				<h3>1</h3>
+				<h3>{{ '%.2f' % (kt.kills['vs'].average()) }} KPM</h3>
+                <h4>{{ kt.kills['vs'].total()|int }} total kills</h4>
 			</div>
 		</div>
 		<div class="col-md-4">
 			<div class="well kpm nc">
 				<h1>NC</h1>
-				<h3>2</h3>
+				<h3>{{ '%.2f' % (kt.kills['nc'].average()) }} KPM</h3>
+                <h4>{{ kt.kills['nc'].total()|int }} total kills</h4>
 			</div>
 		</div>
 		<div class="col-md-4">
 			<div class="well kpm tr">
 				<h1>TR</h1>
-				<h3>3</h3>
+				<h3>{{ '%.2f' % (kt.kills['tr'].average()) }} KPM</h3>
+                <h4>{{ kt.kills['tr'].total()|int }} total kills</h4>
 			</div>
 		</div>
 	</div>

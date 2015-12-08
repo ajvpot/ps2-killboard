@@ -49,7 +49,7 @@ class PS2RealTimeClientProtocol(WebSocketClientProtocol):
 
 		# TODO: Refactor messages into objects with fetch methods for things that need to be resolved
 
-		for x in self.factory.listeners:
+		for x in self.factory.listeners.values():
 			x.onMessage(payload)
 
 		#print payload['event_name']
