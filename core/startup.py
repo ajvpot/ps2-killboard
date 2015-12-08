@@ -3,6 +3,7 @@ import sys
 from twisted.internet import ssl
 from core import app
 from core.listeners.kpm import KPMListener
+from core.listeners.groupkill import GroupKillListener
 from core.util.ps2client import PS2RealTimeClientProtocol
 from core.util.websocket import KillboardServerFactory, KillboardProtocol
 
@@ -27,6 +28,7 @@ def startup():
 	# TODO: refactor websocket crap for live killfeed into a listener
 	factory.listeners = {
 		'kpm': KPMListener(),
+		'groupkill': GroupKillListener(),
 	}
 	factory.protocol = PS2RealTimeClientProtocol
 	factory.receiver = wsFactory

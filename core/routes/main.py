@@ -30,3 +30,10 @@ def lookup(name):
 def kpm():
 	kt = startup.factory.listeners['kpm']
 	return render_template('kpm.html', kt=kt, inaccurate=kt.inaccurate())
+
+@app.route('/groupkill')
+@app.route('/groupkill/<int:top>')
+def groupkill(top=10):
+	kt = startup.factory.listeners['groupkill']
+	return render_template('groupkill.html', kt=kt, cache=cache, top=top)
+

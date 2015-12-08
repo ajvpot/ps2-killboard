@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% block content %}
+	<div class="row">
+		<div class="col-md-12">
+			<h1>Biggest Group Kills</h1>
+		</div>
+	</div>
+	<div class="row" style="text-align: center">
+		<div class="col-md-12">
+			<table class="table">
+				<tr>
+					<th>Name</th>
+					<th>Streak</th>
+				</tr>
+				{% for pid, count in kt.tracker.top(top) %}
+					{% set character=cache.get('character', pid) %}
+					<tr>
+						<td class="{{ character.faction }}">{{ character.disp }}</td>
+						<td>{{ count }}</td>
+					</tr>
+				{% endfor %}
+			</table>
+
+		</div>
+	</div>
+{% endblock %}
