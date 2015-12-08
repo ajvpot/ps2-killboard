@@ -23,7 +23,7 @@ class PS2RealTimeClientProtocol(WebSocketClientProtocol):
 									 'action': 'subscribe',
 									 'world': '17', # emerald
 									 'characters': ['all'],
-									 'eventNames': ['Death', 'VehicleDestroy', 'GainExperience']}))
+									 'eventNames': ['Death', 'VehicleDestroy', 'GainExperience', 'PlayerLogin']}))
 
 		self.factory.receiver.ps2api = self
 

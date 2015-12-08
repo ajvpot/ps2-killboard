@@ -36,7 +36,7 @@ class SimpleEventListener(object):
 		#l.start(5.0)
 
 	def status(self):
-		log.msg(repr(self.tracker.events), system="GroupKillListener")
+		log.msg(repr(self.tracker.events), system="SimpleEventListener")
 
 	def onMessage(self, payload):
 		if(payload['event_name'] == "GainExperience"):
