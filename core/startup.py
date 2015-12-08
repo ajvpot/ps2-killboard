@@ -2,6 +2,7 @@ from autobahn.twisted.websocket import connectWS, WebSocketClientFactory
 import sys
 from twisted.internet import ssl
 from core import app
+from core.listeners.esfcounter import ESFCounterListener
 from core.listeners.kpm import KPMListener
 from core.listeners.groupkill import GroupKillListener
 from core.listeners.simpleevent import SimpleEventListener
@@ -29,6 +30,7 @@ def startup():
 	# set up modules wanting to listen to the ps2 datastream
 	# TODO: refactor websocket crap for live killfeed into a listener
 	factory.listeners = {
+		'esfcounter': ESFCounterListener(),
 		'infantrykpm': KPMListener(filter=lambda payload, character, attacker: payload['attacker_vehicle_id'] == '0'),
 		'sundererkpm': KPMListener(filter=lambda payload, character, attacker: payload['attacker_vehicle_id'] == '2'),
 		'tankkpm': KPMListener(filter=lambda payload, character, attacker: payload['attacker_vehicle_id'] in ('4', '5', '6')),

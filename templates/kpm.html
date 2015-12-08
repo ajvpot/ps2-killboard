@@ -17,6 +17,27 @@
 	<div class="row" style="text-align: center">
 		<div class="col-md-4">
 			<div class="well kpm vs">
+				<h1>VS ESFs</h1>
+				<h3>{{ esfcounter.track['vs'].total() }}</h3>
+			</div>
+		</div>
+		<div class="col-md-4">
+			<div class="well kpm tr">
+				<h1>TR ESFs</h1>
+				<h3>{{ esfcounter.track['tr'].total() }}</h3>
+			</div>
+		</div>
+		<div class="col-md-4">
+			<div class="well kpm nc">
+				<h1>NC ESFs</h1>
+				<h3>{{ esfcounter.track['nc'].total() }}</h3>
+			</div>
+		</div>
+	</div>
+
+	<div class="row" style="text-align: center">
+		<div class="col-md-4">
+			<div class="well kpm vs">
 				<h1>VS</h1>
 				<h3>{{ '%.2f' % (kpm.kills['vs'].average()) }} KPM</h3>
                 <h4>{{ kpm.kills['vs'].total()|int }} total kills</h4>
