@@ -1,3 +1,4 @@
+import time
 from twisted.internet.defer import DeferredList
 from core.ps2data import cache
 
@@ -35,6 +36,9 @@ class ESFCounterListener(object):
 			'tr': ESFReservation('tr'),
 			'vs': ESFReservation('vs'),
 		}
+
+	def csv(self):
+		return '%s,%s,%s,%s' % (int(time.time()), self.track['vs'].total(), self.track['tr'].total(), self.track['nc'].total())
 
 	def onMessage(self, payload):
 		ids = ['5428308138483718321', '5428392193625290673']

@@ -66,6 +66,9 @@ class KPMListener(object):
 		self.started = time.time()
 		self.filter = filter
 
+	def csv(self):
+		return '%s,%s,%s,%s' % (int(time.time()), self.kills['vs'].average(), self.kills['tr'].average(), self.kills['nc'].average())
+
 	# returns true if we haven't had over an hour of stats yet
 	def inaccurate(self):
 		return (time.time()-self.started) < 3600

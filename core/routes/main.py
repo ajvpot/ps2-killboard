@@ -1,3 +1,4 @@
+from core.listeners.kpm import KPMTracker, KPMListener
 import core.startup as startup
 from core import app
 from flask import render_template, redirect, request, flash, abort, url_for, send_from_directory, jsonify
@@ -42,6 +43,18 @@ def kpm():
 		esfkpm=startup.factory.listeners['esfkpm'],
 	    inaccurate=kt.inaccurate()
 	)
+
+@app.route('/stats/esfcounter')
+def stats_esfcounter():
+	return startup.factory.listeners['esfcounter'].csv()
+
+@app.route('/stats/kpm/average/<tag>')
+def stats_kpm(tag):
+	tag = str(tag)
+	if(tag in startup.factory.listeners and isinstance(startup.factory.listeners[tag], KPMListener)):
+		return startup.factory.listeners[tag].csv()
+	else:
+		return 'Unknown tag',404
 
 @app.route('/groupkill')
 @app.route('/groupkill/<int:top>')
