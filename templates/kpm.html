@@ -2,7 +2,7 @@
 {% block content %}
 	<div class="row">
 		<div class="col-md-12">
-			<h1>Kills per Minute per Faction</h1>
+			<h1>Faction KPM over the past hour</h1>
 		</div>
 	</div>
 
@@ -23,17 +23,17 @@
 			</div>
 		</div>
 		<div class="col-md-4">
-			<div class="well kpm nc">
-				<h1>NC</h1>
-				<h3>{{ '%.2f' % (kt.kills['nc'].average()) }} KPM</h3>
-                <h4>{{ kt.kills['nc'].total()|int }} total kills</h4>
-			</div>
-		</div>
-		<div class="col-md-4">
 			<div class="well kpm tr">
 				<h1>TR</h1>
 				<h3>{{ '%.2f' % (kt.kills['tr'].average()) }} KPM</h3>
                 <h4>{{ kt.kills['tr'].total()|int }} total kills</h4>
+			</div>
+		</div>
+		<div class="col-md-4">
+			<div class="well kpm nc">
+				<h1>NC</h1>
+				<h3>{{ '%.2f' % (kt.kills['nc'].average()) }} KPM</h3>
+                <h4>{{ kt.kills['nc'].total()|int }} total kills</h4>
 			</div>
 		</div>
 	</div>
