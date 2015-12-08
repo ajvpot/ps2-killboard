@@ -5,6 +5,7 @@ from core import app
 from core.listeners.kpm import KPMListener
 from core.listeners.groupkill import GroupKillListener
 from core.listeners.simpleevent import SimpleEventListener
+from core.listeners.loginresolver import LoginResolverListener
 from core.util.ps2client import PS2RealTimeClientProtocol
 from core.util.websocket import KillboardServerFactory, KillboardProtocol
 
@@ -38,6 +39,7 @@ def startup():
 		'kpm': KPMListener(),
 		'groupkill': GroupKillListener(),
 		'simpleevent': SimpleEventListener(),
+		'loginresolver': LoginResolverListener(),
 	}
 	factory.protocol = PS2RealTimeClientProtocol
 	factory.receiver = wsFactory
