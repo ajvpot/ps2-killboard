@@ -21,6 +21,7 @@ class PS2RealTimeClientProtocol(WebSocketClientProtocol):
 
 		self.sendMessage(json.dumps({'service': 'event',
 									 'action': 'subscribe',
+									 'world': '17', # emerald
 									 'characters': ['all'],
 									 'eventNames': ['Death', 'VehicleDestroy', 'GainExperience']}))
 

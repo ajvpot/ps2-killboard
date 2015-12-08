@@ -45,7 +45,7 @@ class KPMTracker(object):
 
 	def average(self, clean=True):
 		self._clean()
-		return float(sum([x.total for x in self.hour])) / 60.0
+		return float(sum([x.total for x in self.hour])) / (len(self.hour) if len(self.hour) > 0 else 1) # 60
 
 	def totalAndAverage(self, clean=True):
 		if(clean):
@@ -57,23 +57,18 @@ class KPMTracker(object):
 		return '%s average with %s total' % self.totalAndAverage()
 
 class KPMListener(object):
-	def __init__(self):
+	def __init__(self, filter=None):
 		self.kills = {
 			'tr': KPMTracker(),
 			'nc': KPMTracker(),
 			'vs': KPMTracker(),
 		}
 		self.started = time.time()
-
-		l = LoopingCall(self.status)
-		l.start(5.0, False)
+		self.filter = filter
 
 	# returns true if we haven't had over an hour of stats yet
 	def inaccurate(self):
 		return (time.time()-self.started) < 3600
-
-	def status(self):
-		print repr(self.kills)
 
 	def onMessage(self, payload):
 		if(payload['event_name'] == "Death"):
@@ -100,6 +95,10 @@ class KPMListener(object):
 
 			def _finish(_=None):
 				character,attacker = results
+
+				if(self.filter != None):
+					if(not self.filter(payload, character, attacker)):
+						return
 
 				if(attacker['faction'] != character['faction']):
 					if(attacker['faction'] in self.kills):

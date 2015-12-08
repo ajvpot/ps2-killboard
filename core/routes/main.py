@@ -29,7 +29,18 @@ def lookup(name):
 @app.route('/kpm')
 def kpm():
 	kt = startup.factory.listeners['kpm']
-	return render_template('kpm.html', kt=kt, inaccurate=kt.inaccurate())
+
+	return render_template('kpm.html',
+	    kpm=kt,
+		infantrykpm=startup.factory.listeners['infantrykpm'],
+		sundererkpm=startup.factory.listeners['sundererkpm'],
+		tankkpm=startup.factory.listeners['tankkpm'],
+		harasserkpm=startup.factory.listeners['harasserkpm'],
+		lightningkpm=startup.factory.listeners['lightningkpm'],
+		libkpm=startup.factory.listeners['libkpm'],
+		esfkpm=startup.factory.listeners['esfkpm'],
+	    inaccurate=kt.inaccurate()
+	)
 
 @app.route('/groupkill')
 @app.route('/groupkill/<int:top>')

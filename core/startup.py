@@ -28,6 +28,13 @@ def startup():
 	# set up modules wanting to listen to the ps2 datastream
 	# TODO: refactor websocket crap for live killfeed into a listener
 	factory.listeners = {
+		'infantrykpm': KPMListener(filter=lambda payload, character, attacker: payload['attacker_vehicle_id'] == '0'),
+		'sundererkpm': KPMListener(filter=lambda payload, character, attacker: payload['attacker_vehicle_id'] == '2'),
+		'tankkpm': KPMListener(filter=lambda payload, character, attacker: payload['attacker_vehicle_id'] in ('4', '5', '6')),
+		'harasserkpm': KPMListener(filter=lambda payload, character, attacker: payload['attacker_vehicle_id'] == '12'),
+		'lightningkpm': KPMListener(filter=lambda payload, character, attacker: payload['attacker_vehicle_id'] == '3'),
+		'libkpm': KPMListener(filter=lambda payload, character, attacker: payload['attacker_vehicle_id'] == '10'),
+		'esfkpm': KPMListener(filter=lambda payload, character, attacker: payload['attacker_vehicle_id'] in ('7','8','9')),
 		'kpm': KPMListener(),
 		'groupkill': GroupKillListener(),
 		'simpleevent': SimpleEventListener(),
