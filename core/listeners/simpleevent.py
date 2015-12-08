@@ -41,3 +41,4 @@ class SimpleEventListener(object):
 	def onMessage(self, payload):
 		if(payload['event_name'] == "GainExperience"):
 			self.tracker.mark(payload['experience_id'], payload['character_id'])
+			cache.get('character', payload['character_id']) # Resolve character for webui
