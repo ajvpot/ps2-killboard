@@ -10,7 +10,7 @@
 			if (window.location.protocol === "file:") {
 				wsuri = "ws://127.0.0.1:8080/ws";
 			} else {
-				wsuri = "ws://" + window.location.hostname + ":8080/ws";
+				wsuri = "ws://" + window.location.hostname + ":8080/ws/killboard?subid={{ subid }}";
 			}
 			if ("WebSocket" in window) {
 				sock = new WebSocket(wsuri);
@@ -104,6 +104,7 @@
 			ellog.innerHTML=ellog.innerHTML.substring(ellog.innerHTML.length-10000,ellog.innerHTML.length);
 			ellog.scrollTop = ellog.scrollHeight;
 		};
+
 	</script>
 {% endblock %}
 
@@ -113,7 +114,7 @@
 			<div id="loader" style="text-align: center;">
 				<h1>Loading</h1>
 			</div>
-			<table id="killfeed" class="table" style="display: none;">
+			<table id="killfeed" class="table" style="">
 				<tr>
 					<th >Attacker</th>
 					<th>Attacked</th>
