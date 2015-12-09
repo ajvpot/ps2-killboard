@@ -1,14 +1,15 @@
-from autobahn.twisted.websocket import connectWS, WebSocketClientFactory
 import sys
+
+from autobahn.twisted.websocket import connectWS, WebSocketClientFactory
 from twisted.internet import ssl
-from core import app
+
 from core.listeners.esfcounter import ESFCounterListener
-from core.listeners.kpm import KPMListener
 from core.listeners.groupkill import GroupKillListener
-from core.listeners.simpleevent import SimpleEventListener
+from core.listeners.kpm import KPMListener
 from core.listeners.loginresolver import LoginResolverListener
 from core.util.ps2client import PS2RealTimeClientProtocol
-from core.util.websocket import KillboardServerFactory, KillboardProtocol
+from core.listeners.killboardlistener import KillboardListener
+
 
 def startup():
 	m = sys.modules[__name__]
@@ -32,11 +33,9 @@ def startup():
 		'groupkill': GroupKillListener(),
 		#'simpleevent': SimpleEventListener(),
 		'loginresolver': LoginResolverListener(),
+		'killboardrouter': KillboardListener(),
 	}
 	factory.protocol = PS2RealTimeClientProtocol
-
-	from core.util.killboardrouter import KillboardRouter
-	factory.receiver = KillboardRouter()
 
 	m.factory = factory
 
