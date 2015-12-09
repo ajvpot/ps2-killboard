@@ -18,17 +18,17 @@ class ESFReservation(object):
 
 	def mark(self, characterid):
 		if(not characterid in self.reserve):
-			log.msg('%s ESF Added   (%s wtf) => %s' % (self.name, self.wtf, characterid), system="esfcounter")
+			# log.msg('%s ESF Added   (%s wtf) => %s' % (self.name, self.wtf, characterid), system="esfcounter")
 			self.reserve.append(characterid)
 
 			if(characterid in self.removelater):
 				self.removelater[characterid].cancel()
-				self.removelater[characterid] = reactor.callLater(60*5, self.remove, characterid, False)
+				self.removelater[characterid] = reactor.callLater(60*2, self.remove, characterid, False)
 
 	def remove(self, characterid, wtf=True):
 		if(characterid in self.reserve):
 			self.reserve.remove(characterid)
-			log.msg('%s ESF Removed (%s wtf) => %s' % (self.name, self.wtf, characterid), system="esfcounter")
+			# log.msg('%s ESF Removed (%s wtf) => %s' % (self.name, self.wtf, characterid), system="esfcounter")
 
 			if(characterid in self.removelater):
 				try:
@@ -39,10 +39,10 @@ class ESFReservation(object):
 				del self.removelater[characterid]
 		elif(wtf):
 			self.wtf += 1
-			log.msg('%s ESF WTF!!!! (%s wtf) => %s' % (self.name, self.wtf, characterid), system="esfcounter")
+			# log.msg('%s ESF WTF!!!! (%s wtf) => %s' % (self.name, self.wtf, characterid), system="esfcounter")
 
-	def __repr__(self):
-		return '%s ESFs, %s wtf' % (len(self.reserve), self.wtf)
+	# def __repr__(self):
+	# 	return '%s ESFs, %s wtf' % (len(self.reserve), self.wtf)
 
 class ESFCounterListener(object):
 	def __init__(self):
