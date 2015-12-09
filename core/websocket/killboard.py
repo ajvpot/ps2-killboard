@@ -4,6 +4,7 @@ from orbit.framing import TEXT
 from orbit.server import WebSocketResource
 from orbit.transaction import Transaction, State, TransactionManager
 from collections import deque
+import json
 
 class KillboardState(State):
 	def __init__(self, filter=None):
@@ -12,8 +13,10 @@ class KillboardState(State):
 
 	def onNewConnection(self, ws):
 		ws.opcode = TEXT
-		#for line in self.transaction.buffer:
-		#	self.ws.write(str(line))
+		ws.write(json.dumps({'type': 'status', 'msg': '* Playback start'}))
+		for line in self.transaction.buffer:
+			ws.write(str(line))
+		ws.write(json.dumps({'type': 'status', 'msg': '* Playback complete'}))
 
 	def onUpdate(self, ws, opcode, data, fin):
 		print data
