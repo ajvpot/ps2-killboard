@@ -57,7 +57,7 @@ class KPMTracker(object):
 		return '%s average with %s total' % self.totalAndAverage()
 
 class KPMListener(object):
-	def __init__(self, filter=None):
+	def __init__(self, filter=None, filter_tks=True, filter_suicides=True):
 		self.kills = {
 			'tr': KPMTracker(),
 			'nc': KPMTracker(),
@@ -65,6 +65,8 @@ class KPMListener(object):
 		}
 		self.started = time.time()
 		self.filter = filter
+		self.filter_tks = filter_tks
+		self.filter_suicides = filter_suicides
 
 	def csv(self):
 		return '%s,%s,%s,%s' % (int(time.time()), self.kills['vs'].average(), self.kills['tr'].average(), self.kills['nc'].average())
@@ -75,6 +77,9 @@ class KPMListener(object):
 
 	def onMessage(self, payload):
 		if(payload['event_name'] == "Death"):
+			if(self.filter_suicides and (payload['character_id'] == payload['attacker_character_id'] or payload['attacker_character_id'] == 0)):
+				return
+
 			character = cache.get('character', payload['character_id'])
 			attacker = cache.get('character', payload['attacker_character_id'])
 			# we use a list here because the anonymous functions below can modify it
@@ -103,7 +108,7 @@ class KPMListener(object):
 					if(not self.filter(payload, character, attacker)):
 						return
 
-				if(attacker['faction'] != character['faction']):
+				if(not self.filter_tks or attacker['faction'] != character['faction']):
 					if(attacker['faction'] in self.kills):
 						self.kills[attacker['faction']].mark()
 

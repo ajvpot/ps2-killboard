@@ -6,13 +6,37 @@
 		</div>
 	</div>
 
-    {% if inaccurate %}
-    <div class="row">
-        <div class="col-md-12">
-            <div class="well">WARNING: This page has not collected at least one hour of kill statistics yet, so the kill per minute statistic is likely inaccurate.</div>
-        </div>
-    </div>
-    {% endif %}
+	{% if inaccurate %}
+	<div class="row">
+		<div class="col-md-12">
+			<div class="well">WARNING: This page has not collected at least one hour of kill statistics yet, so the kill per minute statistic is likely inaccurate.</div>
+		</div>
+	</div>
+	{% endif %}
+
+	<div class="row" style="text-align: center">
+		<div class="col-md-4">
+			<div class="well kpm vs">
+				<h1>VS</h1>
+				<h3>{{ '%.2f' % (kpm.kills['vs'].average()) }} KPM</h3>
+				<h4>{{ kpm.kills['vs'].total()|int }} total kills</h4>
+			</div>
+		</div>
+		<div class="col-md-4">
+			<div class="well kpm tr">
+				<h1>TR</h1>
+				<h3>{{ '%.2f' % (kpm.kills['tr'].average()) }} KPM</h3>
+				<h4>{{ kpm.kills['tr'].total()|int }} total kills</h4>
+			</div>
+		</div>
+		<div class="col-md-4">
+			<div class="well kpm nc">
+				<h1>NC</h1>
+				<h3>{{ '%.2f' % (kpm.kills['nc'].average()) }} KPM</h3>
+				<h4>{{ kpm.kills['nc'].total()|int }} total kills</h4>
+			</div>
+		</div>
+	</div>
 
 	<div class="row" style="text-align: center">
 		<div class="col-md-4">
@@ -34,75 +58,99 @@
 			</div>
 		</div>
 	</div>
-
+	
 	<div class="row" style="text-align: center">
 		<div class="col-md-4">
 			<div class="well kpm vs">
-				<h1>VS</h1>
-				<h3>{{ '%.2f' % (kpm.kills['vs'].average()) }} KPM</h3>
-                <h4>{{ kpm.kills['vs'].total()|int }} total kills</h4>
+				<h1>Teamkills</h1>
+				<h3>{{ '%.2f' % (tkkpm.kills['vs'].average()) }} KPM</h3>
+				<h4>{{ tkkpm.kills['vs'].total()|int }} total kills</h4>
 			</div>
 		</div>
 		<div class="col-md-4">
 			<div class="well kpm tr">
-				<h1>TR</h1>
-				<h3>{{ '%.2f' % (kpm.kills['tr'].average()) }} KPM</h3>
-                <h4>{{ kpm.kills['tr'].total()|int }} total kills</h4>
+				<h1>Teamkills</h1>
+				<h3>{{ '%.2f' % (tkkpm.kills['tr'].average()) }} KPM</h3>
+				<h4>{{ tkkpm.kills['tr'].total()|int }} total kills</h4>
 			</div>
 		</div>
 		<div class="col-md-4">
 			<div class="well kpm nc">
-				<h1>NC</h1>
-				<h3>{{ '%.2f' % (kpm.kills['nc'].average()) }} KPM</h3>
-                <h4>{{ kpm.kills['nc'].total()|int }} total kills</h4>
+				<h1>Teamkills</h1>
+				<h3>{{ '%.2f' % (tkkpm.kills['nc'].average()) }} KPM</h3>
+				<h4>{{ tkkpm.kills['nc'].total()|int }} total kills</h4>
 			</div>
 		</div>
 	</div>
-    
+	
+	<div class="row" style="text-align: center">
+		<div class="col-md-4">
+			<div class="well kpm vs">
+				<h1>Suicides</h1>
+				<h3>{{ '%.2f' % (suicidekpm.kills['vs'].average()) }} KPM</h3>
+				<h4>{{ suicidekpm.kills['vs'].total()|int }} total kills</h4>
+			</div>
+		</div>
+		<div class="col-md-4">
+			<div class="well kpm tr">
+				<h1>Suicides</h1>
+				<h3>{{ '%.2f' % (suicidekpm.kills['tr'].average()) }} KPM</h3>
+				<h4>{{ suicidekpm.kills['tr'].total()|int }} total kills</h4>
+			</div>
+		</div>
+		<div class="col-md-4">
+			<div class="well kpm nc">
+				<h1>Suicides</h1>
+				<h3>{{ '%.2f' % (suicidekpm.kills['nc'].average()) }} KPM</h3>
+				<h4>{{ suicidekpm.kills['nc'].total()|int }} total kills</h4>
+			</div>
+		</div>
+	</div>
+	
 	<div class="row" style="text-align: center">
 		<div class="col-md-4">
 			<div class="well kpm vs">
 				<h1>Infantry</h1>
 				<h3>{{ '%.2f' % (infantrykpm.kills['vs'].average()) }} KPM</h3>
-                <h4>{{ infantrykpm.kills['vs'].total()|int }} total kills</h4>
+				<h4>{{ infantrykpm.kills['vs'].total()|int }} total kills</h4>
 			</div>
 		</div>
 		<div class="col-md-4">
 			<div class="well kpm tr">
 				<h1>Infantry</h1>
 				<h3>{{ '%.2f' % (infantrykpm.kills['tr'].average()) }} KPM</h3>
-                <h4>{{ infantrykpm.kills['tr'].total()|int }} total kills</h4>
+				<h4>{{ infantrykpm.kills['tr'].total()|int }} total kills</h4>
 			</div>
 		</div>
 		<div class="col-md-4">
 			<div class="well kpm nc">
 				<h1>Infantry</h1>
 				<h3>{{ '%.2f' % (infantrykpm.kills['nc'].average()) }} KPM</h3>
-                <h4>{{ infantrykpm.kills['nc'].total()|int }} total kills</h4>
+				<h4>{{ infantrykpm.kills['nc'].total()|int }} total kills</h4>
 			</div>
 		</div>
 	</div>
-    
+	
 	<div class="row" style="text-align: center">
 		<div class="col-md-4">
 			<div class="well kpm vs">
 				<h1>Harasser</h1>
 				<h3>{{ '%.2f' % (harasserkpm.kills['vs'].average()) }} KPM</h3>
-                <h4>{{ harasserkpm.kills['vs'].total()|int }} total kills</h4>
+				<h4>{{ harasserkpm.kills['vs'].total()|int }} total kills</h4>
 			</div>
 		</div>
 		<div class="col-md-4">
 			<div class="well kpm tr">
 				<h1>Harasser</h1>
 				<h3>{{ '%.2f' % (harasserkpm.kills['tr'].average()) }} KPM</h3>
-                <h4>{{ harasserkpm.kills['tr'].total()|int }} total kills</h4>
+				<h4>{{ harasserkpm.kills['tr'].total()|int }} total kills</h4>
 			</div>
 		</div>
 		<div class="col-md-4">
 			<div class="well kpm nc">
 				<h1>Harasser</h1>
 				<h3>{{ '%.2f' % (harasserkpm.kills['nc'].average()) }} KPM</h3>
-                <h4>{{ harasserkpm.kills['nc'].total()|int }} total kills</h4>
+				<h4>{{ harasserkpm.kills['nc'].total()|int }} total kills</h4>
 			</div>
 		</div>
 	</div>
@@ -112,126 +160,126 @@
 			<div class="well kpm vs">
 				<h1>Lightning</h1>
 				<h3>{{ '%.2f' % (lightningkpm.kills['vs'].average()) }} KPM</h3>
-                <h4>{{ lightningkpm.kills['vs'].total()|int }} total kills</h4>
+				<h4>{{ lightningkpm.kills['vs'].total()|int }} total kills</h4>
 			</div>
 		</div>
 		<div class="col-md-4">
 			<div class="well kpm tr">
 				<h1>Lightning</h1>
 				<h3>{{ '%.2f' % (lightningkpm.kills['tr'].average()) }} KPM</h3>
-                <h4>{{ lightningkpm.kills['tr'].total()|int }} total kills</h4>
+				<h4>{{ lightningkpm.kills['tr'].total()|int }} total kills</h4>
 			</div>
 		</div>
 		<div class="col-md-4">
 			<div class="well kpm nc">
 				<h1>Lightning</h1>
 				<h3>{{ '%.2f' % (lightningkpm.kills['nc'].average()) }} KPM</h3>
-                <h4>{{ lightningkpm.kills['nc'].total()|int }} total kills</h4>
+				<h4>{{ lightningkpm.kills['nc'].total()|int }} total kills</h4>
 			</div>
 		</div>
 	</div>
-    
-    <div class="row" style="text-align: center">
-        <div class="col-md-4">
-            <div class="well kpm vs">
-                <h1>Sunderer</h1>
-                <h3>{{ '%.2f' % (sundererkpm.kills['vs'].average()) }} KPM</h3>
-                <h4>{{ sundererkpm.kills['vs'].total()|int }} total kills</h4>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="well kpm tr">
-                <h1>Sunderer</h1>
-                <h3>{{ '%.2f' % (sundererkpm.kills['tr'].average()) }} KPM</h3>
-                <h4>{{ sundererkpm.kills['tr'].total()|int }} total kills</h4>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="well kpm nc">
-                <h1>Sunderer</h1>
-                <h3>{{ '%.2f' % (sundererkpm.kills['nc'].average()) }} KPM</h3>
-                <h4>{{ sundererkpm.kills['nc'].total()|int }} total kills</h4>
-            </div>
-        </div>
-    </div>
-    
-    <div class="row" style="text-align: center">
-        <div class="col-md-4">
-            <div class="well kpm vs">
-                <h1>Magrider</h1>
-                <h3>{{ '%.2f' % (tankkpm.kills['vs'].average()) }} KPM</h3>
-                <h4>{{ tankkpm.kills['vs'].total()|int }} total kills</h4>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="well kpm tr">
-                <h1>Prowler</h1>
-                <h3>{{ '%.2f' % (tankkpm.kills['tr'].average()) }} KPM</h3>
-                <h4>{{ tankkpm.kills['tr'].total()|int }} total kills</h4>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="well kpm nc">
-                <h1>Vanguard</h1>
-                <h3>{{ '%.2f' % (tankkpm.kills['nc'].average()) }} KPM</h3>
-                <h4>{{ tankkpm.kills['nc'].total()|int }} total kills</h4>
-            </div>
-        </div>
-    </div>
-    
+	
+	<div class="row" style="text-align: center">
+		<div class="col-md-4">
+			<div class="well kpm vs">
+				<h1>Sunderer</h1>
+				<h3>{{ '%.2f' % (sundererkpm.kills['vs'].average()) }} KPM</h3>
+				<h4>{{ sundererkpm.kills['vs'].total()|int }} total kills</h4>
+			</div>
+		</div>
+		<div class="col-md-4">
+			<div class="well kpm tr">
+				<h1>Sunderer</h1>
+				<h3>{{ '%.2f' % (sundererkpm.kills['tr'].average()) }} KPM</h3>
+				<h4>{{ sundererkpm.kills['tr'].total()|int }} total kills</h4>
+			</div>
+		</div>
+		<div class="col-md-4">
+			<div class="well kpm nc">
+				<h1>Sunderer</h1>
+				<h3>{{ '%.2f' % (sundererkpm.kills['nc'].average()) }} KPM</h3>
+				<h4>{{ sundererkpm.kills['nc'].total()|int }} total kills</h4>
+			</div>
+		</div>
+	</div>
+	
+	<div class="row" style="text-align: center">
+		<div class="col-md-4">
+			<div class="well kpm vs">
+				<h1>Magrider</h1>
+				<h3>{{ '%.2f' % (tankkpm.kills['vs'].average()) }} KPM</h3>
+				<h4>{{ tankkpm.kills['vs'].total()|int }} total kills</h4>
+			</div>
+		</div>
+		<div class="col-md-4">
+			<div class="well kpm tr">
+				<h1>Prowler</h1>
+				<h3>{{ '%.2f' % (tankkpm.kills['tr'].average()) }} KPM</h3>
+				<h4>{{ tankkpm.kills['tr'].total()|int }} total kills</h4>
+			</div>
+		</div>
+		<div class="col-md-4">
+			<div class="well kpm nc">
+				<h1>Vanguard</h1>
+				<h3>{{ '%.2f' % (tankkpm.kills['nc'].average()) }} KPM</h3>
+				<h4>{{ tankkpm.kills['nc'].total()|int }} total kills</h4>
+			</div>
+		</div>
+	</div>
+	
 	<div class="row" style="text-align: center">
 		<div class="col-md-4">
 			<div class="well kpm vs">
 				<h1>Scythe</h1>
 				<h3>{{ '%.2f' % (esfkpm.kills['vs'].average()) }} KPM</h3>
-                <h4>{{ esfkpm.kills['vs'].total()|int }} total kills</h4>
+				<h4>{{ esfkpm.kills['vs'].total()|int }} total kills</h4>
 			</div>
 		</div>
 		<div class="col-md-4">
 			<div class="well kpm tr">
 				<h1>Mosquito</h1>
 				<h3>{{ '%.2f' % (esfkpm.kills['tr'].average()) }} KPM</h3>
-                <h4>{{ esfkpm.kills['tr'].total()|int }} total kills</h4>
+				<h4>{{ esfkpm.kills['tr'].total()|int }} total kills</h4>
 			</div>
 		</div>
 		<div class="col-md-4">
 			<div class="well kpm nc">
 				<h1>Reaver</h1>
 				<h3>{{ '%.2f' % (esfkpm.kills['nc'].average()) }} KPM</h3>
-                <h4>{{ esfkpm.kills['nc'].total()|int }} total kills</h4>
+				<h4>{{ esfkpm.kills['nc'].total()|int }} total kills</h4>
 			</div>
 		</div>
 	</div>
-    
+	
 	<div class="row" style="text-align: center">
 		<div class="col-md-4">
 			<div class="well kpm vs">
 				<h1>Liberator</h1>
 				<h3>{{ '%.2f' % (libkpm.kills['vs'].average()) }} KPM</h3>
-                <h4>{{ libkpm.kills['vs'].total()|int }} total kills</h4>
+				<h4>{{ libkpm.kills['vs'].total()|int }} total kills</h4>
 			</div>
 		</div>
 		<div class="col-md-4">
 			<div class="well kpm tr">
 				<h1>Liberator</h1>
 				<h3>{{ '%.2f' % (libkpm.kills['tr'].average()) }} KPM</h3>
-                <h4>{{ libkpm.kills['tr'].total()|int }} total kills</h4>
+				<h4>{{ libkpm.kills['tr'].total()|int }} total kills</h4>
 			</div>
 		</div>
 		<div class="col-md-4">
 			<div class="well kpm nc">
 				<h1>Liberator</h1>
 				<h3>{{ '%.2f' % (libkpm.kills['nc'].average()) }} KPM</h3>
-                <h4>{{ libkpm.kills['nc'].total()|int }} total kills</h4>
+				<h4>{{ libkpm.kills['nc'].total()|int }} total kills</h4>
 			</div>
 		</div>
 	</div>
-    
-    <div class="row">
-        <div class="col-md-12">
-            <div class="well">
-                <h1>GRAPHS GO HERE LOL</h1>
-            </div>
-        </div>
-    </div>
+	
+	<div class="row">
+		<div class="col-md-12">
+			<div class="well">
+				<h1>GRAPHS GO HERE LOL</h1>
+			</div>
+		</div>
+	</div>
 {% endblock %}

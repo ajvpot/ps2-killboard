@@ -33,6 +33,8 @@ def kpm():
 
 	return render_template('kpm.html',
 	    kpm=kt,
+	    tkkpm=startup.factory.listeners['tkkpm'],
+	    suicidekpm=startup.factory.listeners['suicidekpm'],
 	    esfcounter=startup.factory.listeners['esfcounter'],
 		infantrykpm=startup.factory.listeners['infantrykpm'],
 		sundererkpm=startup.factory.listeners['sundererkpm'],

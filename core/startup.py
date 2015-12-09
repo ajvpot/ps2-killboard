@@ -31,6 +31,8 @@ def startup():
 	# TODO: refactor websocket crap for live killfeed into a listener
 	factory.listeners = {
 		'esfcounter': ESFCounterListener(),
+		'tkkpm': KPMListener(filter=lambda payload, character, attacker: attacker['faction'] == character['faction'], filter_tks=False),
+		'suicidekpm': KPMListener(filter=lambda payload, character, attacker: payload['attacker_character_id'] == payload['character_id'] or payload['attacker_character_id'] == 0, filter_tks=False, filter_suicides=False),
 		'infantrykpm': KPMListener(filter=lambda payload, character, attacker: payload['attacker_vehicle_id'] == '0'),
 		'sundererkpm': KPMListener(filter=lambda payload, character, attacker: payload['attacker_vehicle_id'] == '2'),
 		'tankkpm': KPMListener(filter=lambda payload, character, attacker: payload['attacker_vehicle_id'] in ('4', '5', '6')),

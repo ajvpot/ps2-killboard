@@ -1,4 +1,5 @@
 import time
+from twisted.internet import reactor
 from twisted.internet.defer import DeferredList
 from core.ps2data import cache
 from twisted.python import log
@@ -9,6 +10,7 @@ class ESFReservation(object):
 	def __init__(self, name):
 		self.name = name
 		self.reserve = []
+		self.removelater = {}
 		self.wtf = 0
 
 	def total(self):
@@ -19,10 +21,22 @@ class ESFReservation(object):
 			log.msg('%s ESF Added   (%s wtf) => %s' % (self.name, self.wtf, characterid), system="esfcounter")
 			self.reserve.append(characterid)
 
+			if(characterid in self.removelater):
+				self.removelater[characterid].cancel()
+				self.removelater[characterid] = reactor.callLater(60*5, self.remove, characterid, False)
+
 	def remove(self, characterid, wtf=True):
 		if(characterid in self.reserve):
 			self.reserve.remove(characterid)
 			log.msg('%s ESF Removed (%s wtf) => %s' % (self.name, self.wtf, characterid), system="esfcounter")
+
+			if(characterid in self.removelater):
+				try:
+					self.removelater[characterid].cancel()
+				except:
+					pass
+
+				del self.removelater[characterid]
 		elif(wtf):
 			self.wtf += 1
 			log.msg('%s ESF WTF!!!! (%s wtf) => %s' % (self.name, self.wtf, characterid), system="esfcounter")
