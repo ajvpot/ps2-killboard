@@ -4,6 +4,7 @@ from orbit.framing import TEXT
 from orbit.server import WebSocketResource
 from orbit.transaction import Transaction, State, TransactionManager
 from collections import deque
+from core import app
 import json
 
 class KillboardState(State):
@@ -21,6 +22,9 @@ class KillboardState(State):
 	def onUpdate(self, ws, opcode, data, fin):
 		print data
 		self.transaction.sendUpdate(data)
+		# ToDo: proper filter setting method
+		self.transaction.filter = lambda x: x['type'] == 'parsed' and (int(x['attacker']['id']) in app.config['PS2_INTERESTED_IDS'] or int(x['character']['id']) in app.config['PS2_INTERESTED_IDS'])
+		self.transaction.buffer.clear()
 
 class KillboardTransaction(Transaction):
 	buffer = deque(maxlen=100)
@@ -28,7 +32,7 @@ class KillboardTransaction(Transaction):
 		if not hasattr(self, 'filter'):
 			self.filter = None
 		if(self.filter != None):
-			if(not self.filter(data)):
+			if(not self.filter(json.loads(data))):
 				return
 		self.buffer.append(data)
 		self.sendUpdate(data)
