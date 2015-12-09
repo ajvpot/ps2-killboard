@@ -1,9 +1,4 @@
-from autobahn.twisted.websocket import WebSocketClientProtocol, \
-	WebSocketClientFactory
-from twisted.internet import reactor, ssl
-from autobahn.twisted.websocket import WebSocketClientFactory, \
-    WebSocketClientProtocol, \
-    connectWS
+from autobahn.twisted.websocket import WebSocketClientProtocol
 import json
 from core import app
 from twisted.python import log
@@ -24,8 +19,6 @@ class PS2RealTimeClientProtocol(WebSocketClientProtocol):
 									 'world': '17', # emerald
 									 'characters': ['all'],
 									 'eventNames': ['Death', 'VehicleDestroy', 'GainExperience', 'PlayerLogin', 'PlayerLogout']}))
-
-		self.factory.receiver.ps2api = self
 
 	def onMessage(self, payload, isBinary):
 		self.counter += 1
@@ -54,69 +47,6 @@ class PS2RealTimeClientProtocol(WebSocketClientProtocol):
 			x.onMessage(payload)
 
 		#print payload['event_name']
-		if(payload['event_name'] == "VehicleDestroy"):
-			attacker = cache.get('character', payload['attacker_character_id'])
-
-			if(not attacker['resolved']):
-				def _fix(data):
-					characterid, data = data
-					self.factory.receiver.broadcast(json.dumps({
-						'type': 'resolve',
-						'id': characterid,
-						'data': data
-					}))
-					return (characterid,data)
-
-				attacker['deferred'].addCallback(_fix)
-				del attacker['deferred']
-
-			self.factory.receiver.broadcast(json.dumps({
-				'type': 'parsed',
-				'event_name': 'VehicleDestroy',
-				'attacker': attacker,
-				'attacker_weapon': cache.get('item', payload['attacker_weapon_id']),
-				'vehicle': cache.get('vehicle', payload['vehicle_id']),
-				'faction': cache.get('faction', payload['faction_id']),
-				'seq': self.counter
-			}))
-		elif(payload['event_name'] == "Death"):
-			character = cache.get('character', payload['character_id'])
-			attacker = cache.get('character', payload['attacker_character_id'])
-
-			if(not character['resolved']):
-				def _fix(data):
-					characterid, data = data
-					self.factory.receiver.broadcast(json.dumps({
-						'type': 'resolve',
-						'id': characterid,
-						'data': data
-					}))
-					return (characterid,data)
-
-				character['deferred'].addCallback(_fix)
-				del character['deferred']
-
-			if(not attacker['resolved']):
-				def _fix(data):
-					characterid, data = data
-					self.factory.receiver.broadcast(json.dumps({
-						'type': 'resolve',
-						'id': characterid,
-						'data': data
-					}))
-					return (characterid,data)
-
-				attacker['deferred'].addCallback(_fix)
-				del attacker['deferred']
-
-			self.factory.receiver.broadcast(json.dumps({
-				'type': 'parsed',
-				'event_name': 'Death',
-				'character': character,
-				'attacker': attacker,
-				'attacker_weapon': cache.get('item', payload['attacker_weapon_id']),
-				'seq': self.counter
-			}))
 
 	def onClose(self, wasClean, code, reason):
 		print("WebSocket connection closed: {0}".format(reason))

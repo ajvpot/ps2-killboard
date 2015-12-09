@@ -15,8 +15,9 @@ def index():
 	return render_template('index.html')
 
 @app.route('/feed')
-def feed():
-	return render_template('feed.html')
+@app.route('/feed/<string:subid>')
+def feed(subid="default"):
+	return render_template('feed.html', subid=subid)
 
 @app.route('/dumpcache')
 def dumpcache():

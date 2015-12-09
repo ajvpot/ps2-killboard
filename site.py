@@ -1,14 +1,16 @@
-from twisted.web.wsgi import WSGIResource
-from twisted.internet import reactor
-from twisted.web.server import Site
-from twisted.python import log
-from core import app
-from util.reverseProxiedMiddleware import ReverseProxied
 import sys
+
+from autobahn.twisted.resource import WSGIRootResource
+from twisted.internet import reactor
+from twisted.python import log
 from twisted.web.client import HTTPClientFactory
-from autobahn.twisted.websocket import WebSocketServerFactory, \
-	WebSocketServerProtocol
-from autobahn.twisted.resource import WebSocketResource, WSGIRootResource
+from twisted.web.resource import Resource
+from twisted.web.server import Site
+from twisted.web.wsgi import WSGIResource
+
+from core import app
+from core.websocket.killboard import killboardResource
+from util.reverseProxiedMiddleware import ReverseProxied
 
 # disable httpclientfactory noise
 HTTPClientFactory.noisy = False
@@ -35,14 +37,12 @@ if __name__ == '__main__':
 	core.startup.startup()
 
 	##
-	# create a Twisted Web resource for our WebSocket server
-	##
-	wsResource = WebSocketResource(core.startup.wsFactory)
-
-	##
 	# create a Twisted Web WSGI resource for our Flask server
 	##
 	wsgiResource = WSGIResource(reactor, reactor.getThreadPool(), app)
+
+	wsResource = Resource()
+	wsResource.putChild('killboard', killboardResource)
 
 	##
 	# create a root resource serving everything via WSGI/Flask, but
