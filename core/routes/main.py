@@ -7,6 +7,8 @@ from core.models import db
 from datetime import timedelta
 from collections import defaultdict, OrderedDict
 import operator
+from core.websocket.resolve import transactionManager as resolveTransactionManager
+from core.websocket.resolve import ResolveTransaction, ResolveState
 from datetime import datetime
 import time
 import os
@@ -119,6 +121,8 @@ def weaponMenu(cid, start=None):
 			continue
 		total[kill['attacker_weapon_id']] += 1
 	od = OrderedDict(sorted(total.items(), key=operator.itemgetter(1), reverse=True))
+
+
 	return render_template('weaponmenu.html', total=od, cache=cache, cid=cid, start=start)
 
 @app.route('/player/<cid>/kills/<weapon>/<start>')
@@ -138,6 +142,8 @@ def weaponStats(cid, weapon, start=None):
 	all = []
 	# ToDo: when a player gets a page with unresolved characters in it, make a websocket transaction and subscribe it to all pending resolve deferreds
 	# ToDo: refactor character from dict to object?
+	trans = ResolveTransaction(ResolveState())
+	subid = resolveTransactionManager.addTransaction(trans)
 	for kill in killlist:
 		if int(kill['timestamp']) < start:
 			continue
@@ -145,6 +151,9 @@ def weaponStats(cid, weapon, start=None):
 			continue
 		if int(kill['attacker_weapon_id']) != int(weapon):
 			continue
+		trans.subscribe(cache.get('character', kill['attacker_character_id']))
+		trans.subscribe(cache.get('character', kill['character_id']))
 		all.append(kill)
+	trans.doneSubscribing()
 	od = sorted(all, key=lambda x: int(x['timestamp']), reverse=True)
-	return render_template('weaponstats.html', total=od, cache=cache, cid=cid, start=start, weapon=weapon)
+	return render_template('weaponstats.html', total=od, cache=cache, cid=cid, start=start, weapon=weapon, subid=subid)

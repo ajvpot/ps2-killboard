@@ -10,6 +10,7 @@ from twisted.web.wsgi import WSGIResource
 
 from core import app
 from core.websocket.killboard import killboardResource
+from core.websocket.resolve import resolveResource
 from util.reverseProxiedMiddleware import ReverseProxied
 
 # disable httpclientfactory noise
@@ -43,6 +44,7 @@ if __name__ == '__main__':
 
 	wsResource = Resource()
 	wsResource.putChild('killboard', killboardResource)
+	wsResource.putChild('resolve', resolveResource)
 
 	##
 	# create a root resource serving everything via WSGI/Flask, but

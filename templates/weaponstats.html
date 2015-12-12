@@ -1,4 +1,52 @@
 {% extends "layout.html" %}
+{% block include %}
+	{{ super() }}
+	<script type="text/javascript">
+		var sock = null;
+		var ellog = null;
+		window.onload = function() {
+			ellog = document.getElementById('log');
+			var wsuri;
+			if (window.location.protocol === "file:") {
+				wsuri = "ws://127.0.0.1:8080/ws";
+			} else {
+				wsuri = "ws://" + window.location.hostname + ":8080/ws/resolve?subid={{ subid }}";
+			}
+			if ("WebSocket" in window) {
+				sock = new WebSocket(wsuri);
+			} else if ("MozWebSocket" in window) {
+				sock = new MozWebSocket(wsuri);
+			} else {
+				log("Browser does not support WebSocket!");
+				window.location = "http://autobahn.ws/unsupportedbrowser";
+			}
+			if (sock) {
+				sock.onopen = function() {
+					log("Connected to " + wsuri);
+				}
+				sock.onclose = function(e) {
+					log("Connection closed (wasClean = " + e.wasClean + ", code = " + e.code + ", reason = '" + e.reason + "')");
+					sock = null;
+				}
+				sock.onmessage = function(e) {
+
+					log("< " + e.data);
+					data = JSON.parse(e.data);
+					if(data['type'] == "resolve"){
+						$("td").filter(function() {
+							return $(this).text() == data['id'];
+						}).text(data['data']['disp']).addClass(data['data']['faction']).removeClass('loading');
+						// ToDo: do name links properly.
+					}
+				}
+			}
+		};
+		function log(m) {
+			console.log(m);
+		};
+
+	</script>
+{% endblock %}
 {% block content %}
 	<div class="row">
 		<div class="col-md-12">
