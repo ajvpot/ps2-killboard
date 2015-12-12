@@ -1,4 +1,4 @@
-from flask import Flask, g
+from flask import Flask, g, request
 from flask_admin import Admin
 from flask.ext.sqlalchemy import SQLAlchemy
 from datetime import timedelta
@@ -32,11 +32,13 @@ import core.admin
 
 # this is how you could make a function globally available in views
 app.jinja_env.globals.update(app=app)
+app.jinja_env.globals.update(request=request)
 
 # this is how you could add a filter to be globally available in views
 # app.jinja_env.filters['formatElapsedTime'] = formatElapsedTime
 # login manager
 import core.login
+import core.formatters
 
 # to add new routes just import them here
 import core.routes.main

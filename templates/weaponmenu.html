@@ -2,7 +2,7 @@
 {% block content %}
 	<div class="row">
 		<div class="col-md-12">
-			<h1>Weapon Stats for <a href="{{ url_for('player', cid=cid) }}">{{ cache.get('character', cid)['name'] }}</a></h1>
+			<h1>Weapon Stats for {{ characterinline(cache.get('character', cid)) }}</h1>
 		</div>
 	</div>
 	<div class="row">

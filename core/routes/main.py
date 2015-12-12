@@ -7,13 +7,18 @@ from core.models import db
 from datetime import timedelta
 from collections import defaultdict, OrderedDict
 import operator
-from core.websocket.resolve import transactionManager as resolveTransactionManager
-from core.websocket.resolve import ResolveTransaction, ResolveState
+from core.formatters import resolveCharacterNames
 from datetime import datetime
 import time
 import os
 import requests
 from core.ps2data import cache
+from jinja2 import Template, Markup
+
+
+
+
+
 
 @app.route('/')
 def index():
@@ -22,7 +27,7 @@ def index():
 @app.route('/feed')
 @app.route('/feed/<string:subid>')
 def feed(subid="default"):
-	return render_template('feed.html', subid=subid)
+	return render_template('feed.html', kbid=subid)
 
 @app.route('/dumpcache')
 def dumpcache():
@@ -66,6 +71,7 @@ def stats_kpm(tag):
 
 @app.route('/groupkill')
 @app.route('/groupkill/<int:top>')
+@resolveCharacterNames
 def groupkill(top=10):
 	kt = startup.factory.listeners['groupkill']
 	return render_template('groupkill.html', kt=kt, cache=cache, top=top)
@@ -77,6 +83,7 @@ def eventlist():
 
 @app.route('/event/<string:event>')
 @app.route('/event/<string:event>/<int:top>')
+@resolveCharacterNames
 def simpleevent(event, top=10):
 	kt = startup.factory.listeners['simpleevent']
 	return render_template('simple.html', kt=kt, cache=cache, event=event, top=top)
@@ -87,6 +94,7 @@ def playerSearch():
 
 @app.route('/player/<cid>/')
 @app.route('/player/<cid>')
+@resolveCharacterNames
 def player(cid):
 	try:
 		int(cid)
@@ -103,6 +111,7 @@ def player(cid):
 @app.route('/player/<cid>/kills/')
 @app.route('/player/<cid>/kills/<start>')
 @app.route('/player/<cid>/kills/<start>/')
+@resolveCharacterNames
 def weaponMenu(cid, start=None):
 	if start is None:
 		start = int(time.time() - (60*60*24))
@@ -129,6 +138,7 @@ def weaponMenu(cid, start=None):
 @app.route('/player/<cid>/kills/<weapon>/<start>/')
 @app.route('/player/<cid>/kills/<weapon>')
 @app.route('/player/<cid>/kills/<weapon>/')
+@resolveCharacterNames
 def weaponStats(cid, weapon, start=None):
 	if start is None:
 		start = int(time.time() - (60*60*24))
@@ -142,8 +152,6 @@ def weaponStats(cid, weapon, start=None):
 	all = []
 	# ToDo: when a player gets a page with unresolved characters in it, make a websocket transaction and subscribe it to all pending resolve deferreds
 	# ToDo: refactor character from dict to object?
-	trans = ResolveTransaction(ResolveState())
-	subid = resolveTransactionManager.addTransaction(trans)
 	for kill in killlist:
 		if int(kill['timestamp']) < start:
 			continue
@@ -151,9 +159,8 @@ def weaponStats(cid, weapon, start=None):
 			continue
 		if int(kill['attacker_weapon_id']) != int(weapon):
 			continue
-		trans.subscribe(cache.get('character', kill['attacker_character_id']))
-		trans.subscribe(cache.get('character', kill['character_id']))
 		all.append(kill)
-	trans.doneSubscribing()
+	#trans.doneSubscribing() # ToDo
 	od = sorted(all, key=lambda x: int(x['timestamp']), reverse=True)
-	return render_template('weaponstats.html', total=od, cache=cache, cid=cid, start=start, weapon=weapon, subid=subid)
+
+	return render_template('weaponstats.html', total=od, cache=cache, cid=cid, start=start, weapon=weapon)

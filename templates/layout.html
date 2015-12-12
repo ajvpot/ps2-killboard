@@ -1,117 +1,159 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8">
-		<meta http-equiv="X-UA-Compatible" content="IE=edge">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-		<meta name="description" content="">
-		<meta name="author" content="">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+	<meta name="description" content="">
+	<meta name="author" content="">
 
-		<title>{{ title or 'Killboard' }}</title>
+	<title>{{ title or 'Killboard' }}</title>
 
-		<!-- Bootstrap core CSS -->
-		<link href="/static/bootstrap.css" rel="stylesheet">
+	<!-- Bootstrap core CSS -->
+	<link href="/static/bootstrap.css" rel="stylesheet">
 
 
-		<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-		<!--[if lt IE 9]>
+	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+	<!--[if lt IE 9]>
 		<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
 		<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 		<![endif]-->
 
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-		<script src="/static/bootstrap.js"></script>
-		<style>
-			.nc{
-				background-color: #4C4EA9;
-			}
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+	<script src="/static/bootstrap.js"></script>
+	<style>
+		.nc{
+			background-color: #4C4EA9;
+		}
 
-			.tr{
-				background-color: #B90E26;
-			}
+		.tr{
+			background-color: #B90E26;
+		}
 
-			.vs{
-				background-color: #6E4692;
-			}
+		.vs{
+			background-color: #6E4692;
+		}
 
-			.ns{
-				background-color: #212121;
-			}
+		.ns{
+			background-color: #212121;
+		}
 
-			.faction a:link{
-				color: inherit;
-				text-decoration: none;
-			}
-			.faction a:visited{
-				color: inherit;
-				text-decoration: none;
-			}
+		.faction a:link{
+			color: inherit;
+			text-decoration: none;
+		}
+		.faction a:visited{
+			color: inherit;
+			text-decoration: none;
+		}
 
-			td{
-				color: #ffffff;
-				background-color: #151515;
-			}
+		td{
+			color: #ffffff;
+			background-color: #151515;
+		}
 
-			.vehicle { /* ToDo: differentiate this from people */
-				color: #ffffff;
-			}
+		.vehicle { /* ToDo: differentiate this from people */
+			color: #ffffff;
+		}
 
-			table{
-				 table-layout: fixed;
-			}
+		table{
+			table-layout: fixed;
+		}
 
-			.loading {
-				color:#505050;
-				background-image: url({{ url_for('static', filename='ajax-loader.gif') }});
-				background-repeat: no-repeat;
-				background-size: contain;
-			}
+		.loading {
+			color:#505050;
+			background-image: url({{ url_for('static', filename='ajax-loader.gif') }});
+			background-repeat: no-repeat;
+			background-size: contain;
+		}
 
-			{% block include_css %}
-			{% endblock %}
-		</style>
-
-		{% block include %}
+		{% block include_css %}
 		{% endblock %}
-	</head>
+	</style>
+	{% if request.resolveSubid %}
+		<script type="text/javascript">
+			var sock = null;
+			window.onload = function() {
+				var wsuri;
+				if (window.location.protocol === "file:") {
+					wsuri = "ws://127.0.0.1:8080/ws";
+				} else {
+					wsuri = "ws://" + window.location.hostname + ":8080/ws/resolve?subid={{ request.resolveSubid }}";
+				}
+				if ("WebSocket" in window) {
+					sock = new WebSocket(wsuri);
+				} else if ("MozWebSocket" in window) {
+					sock = new MozWebSocket(wsuri);
+				} else {
+					log("Browser does not support WebSocket!");
+					window.location = "http://autobahn.ws/unsupportedbrowser";
+				}
+				if (sock) {
+					sock.onopen = function() {
+						log("Connected to " + wsuri);
+					}
+					sock.onclose = function(e) {
+						log("Connection closed (wasClean = " + e.wasClean + ", code = " + e.code + ", reason = '" + e.reason + "')");
+						sock = null;
+					}
+					sock.onmessage = function(e) {
 
-	<body>
-		<div class="container">
-			<nav class="navbar navbar-default">
-				<div class="container-fluid">
-					<div class="navbar-header">
-						<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-							<span class="sr-only">Toggle navigation</span>
-							<span class="icon-bar"></span>
-							<span class="icon-bar"></span>
-							<span class="icon-bar"></span>
-						</button>
-						<a class="navbar-brand" href="{{ url_for('index') }}">Killboard</a>
-					</div>
+						log("< " + e.data);
+						data = JSON.parse(e.data);
+						if(data['type'] == "resolve"){
+							$("td[data-cid="+data['id']+"]").replaceWith(data['cell']);
+							$("span[data-cid="+data['id']+"]").replaceWith(data['inline']);
+						}
+					}
+				}
+			};
+			function log(m) {
+				console.log(m);
+			};
 
-					<div id="navbar" class="navbar-collapse collapse">
-						<ul class="nav navbar-nav">
-							<!--<li class="active"><a href="#">Home</a></li>-->
-							<li><a href="{{ url_for('feed') }}">Feed</a></li>
-							<li><a href="{{ url_for('kpm') }}">KPM</a></li>
-							<li><a href="{{ url_for('groupkill') }}">GroupKill</a></li>
-							<li><a href="{{ url_for('eventlist') }}">Events</a></li>
-						</ul>
-						<div class="col-sm-3 col-md-3 pull-right">
-							<form class="navbar-form" role="search" action="{{ url_for('playerSearch') }}" method="POST">
-								<div class="input-group">
-									<input type="text" class="form-control" placeholder="Search" name="player" id="playersearch">
-									<div class="input-group-btn">
-										<button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
-									</div>
-								</div>
+		</script>
+	{% endif %}
+	{% block include %}
+	{% endblock %}
+</head>
+
+<body>
+<div class="container">
+	<nav class="navbar navbar-default">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="{{ url_for('index') }}">Killboard</a>
+			</div>
+
+			<div id="navbar" class="navbar-collapse collapse">
+				<ul class="nav navbar-nav">
+					<!--<li class="active"><a href="#">Home</a></li>-->
+					<li><a href="{{ url_for('feed') }}">Feed</a></li>
+					<li><a href="{{ url_for('kpm') }}">KPM</a></li>
+					<li><a href="{{ url_for('groupkill') }}">GroupKill</a></li>
+					<li><a href="{{ url_for('eventlist') }}">Events</a></li>
+				</ul>
+				<div class="col-sm-3 col-md-3 pull-right">
+					<form class="navbar-form" role="search" action="{{ url_for('playerSearch') }}" method="POST">
+						<div class="input-group">
+							<input type="text" class="form-control" placeholder="Search" name="player" id="playersearch">
+							<div class="input-group-btn">
+								<button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
+							</div>
 						</div>
-					</div>
-			</nav>
+				</div>
+			</div>
+	</nav>
 
-			{% block content %}
-			{% endblock %}
-		</div>
-	</body>
+	{% block content %}
+	{% endblock %}
+</div>
+</body>
 </html>

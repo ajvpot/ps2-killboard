@@ -1,56 +1,8 @@
 {% extends "layout.html" %}
-{% block include %}
-	{{ super() }}
-	<script type="text/javascript">
-		var sock = null;
-		var ellog = null;
-		window.onload = function() {
-			ellog = document.getElementById('log');
-			var wsuri;
-			if (window.location.protocol === "file:") {
-				wsuri = "ws://127.0.0.1:8080/ws";
-			} else {
-				wsuri = "ws://" + window.location.hostname + ":8080/ws/resolve?subid={{ subid }}";
-			}
-			if ("WebSocket" in window) {
-				sock = new WebSocket(wsuri);
-			} else if ("MozWebSocket" in window) {
-				sock = new MozWebSocket(wsuri);
-			} else {
-				log("Browser does not support WebSocket!");
-				window.location = "http://autobahn.ws/unsupportedbrowser";
-			}
-			if (sock) {
-				sock.onopen = function() {
-					log("Connected to " + wsuri);
-				}
-				sock.onclose = function(e) {
-					log("Connection closed (wasClean = " + e.wasClean + ", code = " + e.code + ", reason = '" + e.reason + "')");
-					sock = null;
-				}
-				sock.onmessage = function(e) {
-
-					log("< " + e.data);
-					data = JSON.parse(e.data);
-					if(data['type'] == "resolve"){
-						$("td").filter(function() {
-							return $(this).text() == data['id'];
-						}).text(data['data']['disp']).addClass(data['data']['faction']).removeClass('loading');
-						// ToDo: do name links properly.
-					}
-				}
-			}
-		};
-		function log(m) {
-			console.log(m);
-		};
-
-	</script>
-{% endblock %}
 {% block content %}
 	<div class="row">
 		<div class="col-md-12">
-			<h1>Weapon Stats for <a href="{{ url_for('player', cid=cid) }}">{{ cache.get('character', cid)['name'] }}</a> / {{ cache.get('item', weapon) }}</h1>
+			<h1>Weapon Stats for {{ characterinline(cache.get('character', cid)) }} / {{ cache.get('item', weapon) }}</h1>
 		</div>
 	</div>
 	<div class="row">
@@ -69,8 +21,8 @@
 				</tr>
 				{% for kill in total %}
 					<tr>
-						<td class="faction {{ cache.get('character', kill['attacker_character_id'])['faction'] }}"><a href="{{ url_for('player', cid=kill['attacker_character_id']) }}">{{ cache.get('character', kill['attacker_character_id'])['disp'] }}</a></td>
-						<td class="faction {{ cache.get('character', kill['character_id'])['faction'] }}"><a href="{{ url_for('player', cid=kill['character_id']) }}">{{ cache.get('character', kill['character_id'])['disp'] }}</a></td>
+						{{ charactercell(cache.get('character', kill['attacker_character_id'])) }}
+						{{ charactercell(cache.get('character', kill['character_id'])) }}
 						<td>{{ kill['is_headshot'] }}</td>
 						<td>{{ kill['is_headshot'] }}</td>
 					</tr>

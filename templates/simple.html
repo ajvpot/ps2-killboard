@@ -13,9 +13,8 @@
 					<th>Count</th>
 				</tr>
 				{% for pid, count in kt.tracker.top(event, top) %}
-					{% set character=cache.get('character', pid) %}
 					<tr>
-						<td class="{{ character.faction }}">{{ character.disp }}</td>
+						{{ charactercell(cache.get('character', pid)) }}
 						<td>{{ count }}</td>
 					</tr>
 				{% endfor %}

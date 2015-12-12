@@ -3,14 +3,12 @@
 	{{ super() }}
 	<script type="text/javascript">
 		var sock = null;
-		var ellog = null;
 		window.onload = function() {
-			ellog = document.getElementById('log');
 			var wsuri;
 			if (window.location.protocol === "file:") {
 				wsuri = "ws://127.0.0.1:8080/ws";
 			} else {
-				wsuri = "ws://" + window.location.hostname + ":8080/ws/killboard?subid={{ subid }}";
+				wsuri = "ws://" + window.location.hostname + ":8080/ws/killboard?subid={{ kbid }}";
 			}
 			if ("WebSocket" in window) {
 				sock = new WebSocket(wsuri);
@@ -85,24 +83,8 @@
 				}
 			}
 		};
-		function resolveCharacter(){
-
-		}
-		function send() {
-			var msg = document.getElementById('message').value;
-			if (sock) {
-				sock.send(msg);
-				log("> " + msg);
-			} else {
-				log("Not connected.");
-			}
-		};
 		function log(m) {
 			console.log(m);
-			return;
-			ellog.innerHTML += m + '\n';
-			ellog.innerHTML=ellog.innerHTML.substring(ellog.innerHTML.length-10000,ellog.innerHTML.length);
-			ellog.scrollTop = ellog.scrollHeight;
 		};
 
 	</script>

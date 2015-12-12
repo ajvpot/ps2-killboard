@@ -7,14 +7,17 @@ from collections import deque
 from core import app
 from twisted.internet import reactor
 from twisted.internet.defer import gatherResults
+from core.formatters import characterinline, charactercell
 import json
 
 class ResolveState(State):
 	def onNewConnection(self, ws):
 		ws.opcode = TEXT
 		ws.write(json.dumps({'type': 'status', 'msg': 'Subscribed'}))
+		ws.write(json.dumps({'type': 'status', 'msg': 'Replay'}))
 		for line in self.transaction.buffer:
 			ws.write(line)
+		ws.write(json.dumps({'type': 'status', 'msg': 'Live'}))
 
 class ResolveTransaction(Transaction):
 	buffer = deque(maxlen=250) # hopefully you dont subscribe to this much shit
@@ -24,10 +27,12 @@ class ResolveTransaction(Transaction):
 			return
 		else:
 			def _fix(ret):
-				data = json.dumps({'id': ret[0], 'type': 'resolve', 'data': ret[1]})
+				data = json.dumps({'id': ret[0], 'type': 'resolve', 'inline': str(characterinline(ret[1])), 'cell': str(charactercell(ret[1]))})
 				self.buffer.append(data)
 				self.sendUpdate(data)
-			self.deferreds.append(cacheResult['deferred'].addCallback(_fix))
+			def printErr(ret):
+				ret.printDetailedTraceback()
+			self.deferreds.append(cacheResult['deferred'].addCallback(_fix).addErrback(printErr))
 	def doneSubscribing(self):
 		dl = gatherResults(self.deferreds)
 		def doneResolving(data, trans):
