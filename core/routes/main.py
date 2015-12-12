@@ -24,7 +24,7 @@ def feed(subid="default"):
 
 @app.route('/dumpcache')
 def dumpcache():
-	return jsonify(cache=cache)
+	return jsonify(cache=cache.cache)
 
 @app.route('/lookup/<name>')
 def lookup(name):
@@ -79,6 +79,10 @@ def simpleevent(event, top=10):
 	kt = startup.factory.listeners['simpleevent']
 	return render_template('simple.html', kt=kt, cache=cache, event=event, top=top)
 
+@app.route('/playersearch', methods=['POST'])
+def playerSearch():
+	return redirect(url_for('player', cid=request.form.get('player')))
+
 @app.route('/player/<cid>/')
 @app.route('/player/<cid>')
 def player(cid):
@@ -132,18 +136,15 @@ def weaponStats(cid, weapon, start=None):
 		abort(404)
 	killlist = rd['characters_event_list']
 	all = []
+	# ToDo: when a player gets a page with unresolved characters in it, make a websocket transaction and subscribe it to all pending resolve deferreds
+	# ToDo: refactor character from dict to object?
 	for kill in killlist:
 		if int(kill['timestamp']) < start:
-			print "time"
 			continue
 		if kill['attacker_character_id'] == kill['character_id']:
-			print "suicide"
 			continue
 		if int(kill['attacker_weapon_id']) != int(weapon):
-			print "cont"
 			continue
-		print "Add"
 		all.append(kill)
 	od = sorted(all, key=lambda x: int(x['timestamp']), reverse=True)
-	print od
 	return render_template('weaponstats.html', total=od, cache=cache, cid=cid, start=start, weapon=weapon)

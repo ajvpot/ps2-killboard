@@ -43,6 +43,7 @@ class GroupKillTracker(object):
 			return self.active[pid]
 
 	def mark(self, pid):
+		# ToDo: prune
 		self._getStreak(pid).mark()
 
 	def top(self, top=10):

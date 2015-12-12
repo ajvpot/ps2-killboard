@@ -63,7 +63,7 @@
 
 			.loading {
 				color:#505050;
-				background-image: url(static/ajax-loader.gif);
+				background-image: url({{ url_for('static', filename='ajax-loader.gif') }});
 				background-repeat: no-repeat;
 				background-size: contain;
 			}
@@ -98,8 +98,16 @@
 							<li><a href="{{ url_for('groupkill') }}">GroupKill</a></li>
 							<li><a href="{{ url_for('eventlist') }}">Events</a></li>
 						</ul>
+						<div class="col-sm-3 col-md-3 pull-right">
+							<form class="navbar-form" role="search" action="{{ url_for('playerSearch') }}" method="POST">
+								<div class="input-group">
+									<input type="text" class="form-control" placeholder="Search" name="player" id="playersearch">
+									<div class="input-group-btn">
+										<button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
+									</div>
+								</div>
+						</div>
 					</div>
-				</div>
 			</nav>
 
 			{% block content %}
