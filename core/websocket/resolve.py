@@ -35,11 +35,15 @@ class ResolveTransaction(Transaction):
 			self.deferreds.append(cacheResult['deferred'].addCallback(_fix).addErrback(printErr))
 	def doneSubscribing(self):
 		dl = gatherResults(self.deferreds)
-		def doneResolving(data, trans):
-			print "done resolving"
+		def _doneResolving(data, trans):
 			reactor.callLater(5, trans.finish) # don't kill the transaction before the client connects
-		dl.addCallback(doneResolving, self)
-		reactor.callLater(30, self.finish) # timeout
+		dl.addCallback(_doneResolving, self)
+		def _cleanup():
+			try:
+				self.finish()
+			except:
+				pass
+		reactor.callLater(30, _cleanup) # timeout
 
 
 transactionManager = TransactionManager()

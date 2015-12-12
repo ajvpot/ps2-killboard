@@ -117,7 +117,7 @@ def weaponMenu(cid, start=None):
 		start = int(time.time() - (60*60*24))
 	else:
 		start = int(start)
-	r = requests.get('https://census.daybreakgames.com/s:vanderpot/get/ps2:v2/characters_event/?character_id=%s&c:limit=10000&type=KILL' % cid)
+	r = requests.get('https://census.daybreakgames.com/s:vanderpot/get/ps2:v2/characters_event/?character_id=%s&c:limit=1000000&type=KILL' % cid)
 	rd = r.json()
 	if rd['returned'] == 0:
 		abort(404)
@@ -144,7 +144,7 @@ def weaponStats(cid, weapon, start=None):
 		start = int(time.time() - (60*60*24))
 	else:
 		start = int(start)
-	r = requests.get('https://census.daybreakgames.com/s:vanderpot/get/ps2:v2/characters_event/?character_id=%s&c:limit=10000&type=KILL' % cid)
+	r = requests.get('https://census.daybreakgames.com/s:vanderpot/get/ps2:v2/characters_event/?character_id=%s&c:limit=1000000&type=KILL' % cid)
 	rd = r.json()
 	if rd['returned'] == 0:
 		abort(404)

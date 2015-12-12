@@ -97,6 +97,9 @@
 						log("Connection closed (wasClean = " + e.wasClean + ", code = " + e.code + ", reason = '" + e.reason + "')");
 						sock = null;
 					}
+					sock.onerror = function(e) {
+						location.reload();
+					}
 					sock.onmessage = function(e) {
 
 						log("< " + e.data);
