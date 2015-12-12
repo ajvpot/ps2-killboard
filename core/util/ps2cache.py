@@ -142,7 +142,7 @@ class PS2Cache(object):
 				d.addCallback(_fix)
 				self.miss += 1
 
-				return {'resolved': False, 'name': key, 'id': key, 'deferred': d}
+				return {'resolved': False, 'name': key, 'id': key, 'disp': key, 'faction': 'loading', 'deferred': d}
 		else:
 			if key in self.cache[type].keys():
 				self.hit += 1

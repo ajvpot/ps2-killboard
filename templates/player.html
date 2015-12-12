@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+{% block content %}
+	<div class="row">
+		<div class="col-md-12">
+			<h1>{{ cache.get('character', cid)['name'] }}</h1>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-12">
+			<h3>Stats</h3>
+		</div>
+	</div>
+	<div class="row" style="text-align: center">
+		<div class="col-md-12">
+			<a href="{{ url_for('weaponMenu', cid=cid) }}">Kills per weapon, rolling 24 hours.</a><br />
+		</div>
+	</div>
+{% endblock %}

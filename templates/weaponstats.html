@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+{% block content %}
+	<div class="row">
+		<div class="col-md-12">
+			<h1>Weapon Stats for <a href="{{ url_for('player', cid=cid) }}">{{ cache.get('character', cid)['name'] }}</a> / {{ cache.get('item', weapon) }}</h1>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-12">
+			<h3>Kills rolling 24 hours</h3>
+		</div>
+	</div>
+	<div class="row" style="text-align: center">
+		<div class="col-md-12">
+			<table class="table">
+				<tr>
+					<th>Attacker</th>
+					<th>Killed</th>
+					<th>Headshot</th>
+					<th>Time</th>
+				</tr>
+				{% for kill in total %}
+					<tr>
+						<td class="faction {{ cache.get('character', kill['attacker_character_id'])['faction'] }}"><a href="{{ url_for('player', cid=kill['attacker_character_id']) }}">{{ cache.get('character', kill['attacker_character_id'])['disp'] }}</a></td>
+						<td class="faction {{ cache.get('character', kill['character_id'])['faction'] }}"><a href="{{ url_for('player', cid=kill['character_id']) }}">{{ cache.get('character', kill['character_id'])['disp'] }}</a></td>
+						<td>{{ kill['is_headshot'] }}</td>
+						<td>{{ kill['is_headshot'] }}</td>
+					</tr>
+
+				{% endfor %}
+			</table>
+		</div>
+	</div>
+{% endblock %}

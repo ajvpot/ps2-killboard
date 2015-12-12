@@ -22,18 +22,10 @@ class KillboardState(State):
 	def onUpdate(self, ws, opcode, data, fin):
 		print data
 		self.transaction.sendUpdate(data)
-		# ToDo: proper filter setting method
-		self.transaction.filter = lambda x: x['type'] == 'parsed' and (int(x['attacker']['id']) in app.config['PS2_INTERESTED_IDS'] or int(x['character']['id']) in app.config['PS2_INTERESTED_IDS'])
-		self.transaction.buffer.clear()
 
 class KillboardTransaction(Transaction):
 	buffer = deque(maxlen=100)
 	def fromCensus(self, data):
-		if not hasattr(self, 'filter'):
-			self.filter = None
-		if(self.filter != None):
-			if(not self.filter(json.loads(data))):
-				return
 		self.buffer.append(data)
 		self.sendUpdate(data)
 

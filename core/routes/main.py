@@ -5,7 +5,10 @@ from flask import render_template, redirect, request, flash, abort, url_for, sen
 from flask.ext.login import login_required, current_user, fresh_login_required
 from core.models import db
 from datetime import timedelta
+from collections import defaultdict, OrderedDict
+import operator
 from datetime import datetime
+import time
 import os
 import requests
 from core.ps2data import cache
@@ -21,7 +24,7 @@ def feed(subid="default"):
 
 @app.route('/dumpcache')
 def dumpcache():
-	return jsonify(cache=cache, buffer=list(startup.wsFactory.buffer))
+	return jsonify(cache=cache)
 
 @app.route('/lookup/<name>')
 def lookup(name):
@@ -75,3 +78,72 @@ def eventlist():
 def simpleevent(event, top=10):
 	kt = startup.factory.listeners['simpleevent']
 	return render_template('simple.html', kt=kt, cache=cache, event=event, top=top)
+
+@app.route('/player/<cid>/')
+@app.route('/player/<cid>')
+def player(cid):
+	try:
+		int(cid)
+	except:
+		r = requests.get('https://census.daybreakgames.com/s:vanderpot/get/ps2:v2/character/?name.first_lower=%s&c:show=character_id' % cid)
+		try:
+			newcid = r.json()['character_list'][0]['character_id']
+		except IndexError:
+			abort(404)
+		return redirect(url_for('player', cid=newcid))
+	return render_template('player.html', cid=cid, cache=cache) # ToDo: put cache in globals for jinja?
+
+@app.route('/player/<cid>/kills')
+@app.route('/player/<cid>/kills/')
+@app.route('/player/<cid>/kills/<start>')
+@app.route('/player/<cid>/kills/<start>/')
+def weaponMenu(cid, start=None):
+	if start is None:
+		start = int(time.time() - (60*60*24))
+	else:
+		start = int(start)
+	r = requests.get('https://census.daybreakgames.com/s:vanderpot/get/ps2:v2/characters_event/?character_id=%s&c:limit=10000&type=KILL' % cid)
+	rd = r.json()
+	if rd['returned'] == 0:
+		abort(404)
+	killlist = rd['characters_event_list']
+	total = defaultdict(int)
+	for kill in killlist:
+		if int(kill['timestamp']) < start:
+			continue
+		if kill['attacker_character_id'] == kill['character_id']:
+			continue
+		total[kill['attacker_weapon_id']] += 1
+	od = OrderedDict(sorted(total.items(), key=operator.itemgetter(1), reverse=True))
+	return render_template('weaponmenu.html', total=od, cache=cache, cid=cid, start=start)
+
+@app.route('/player/<cid>/kills/<weapon>/<start>')
+@app.route('/player/<cid>/kills/<weapon>/<start>/')
+@app.route('/player/<cid>/kills/<weapon>')
+@app.route('/player/<cid>/kills/<weapon>/')
+def weaponStats(cid, weapon, start=None):
+	if start is None:
+		start = int(time.time() - (60*60*24))
+	else:
+		start = int(start)
+	r = requests.get('https://census.daybreakgames.com/s:vanderpot/get/ps2:v2/characters_event/?character_id=%s&c:limit=10000&type=KILL' % cid)
+	rd = r.json()
+	if rd['returned'] == 0:
+		abort(404)
+	killlist = rd['characters_event_list']
+	all = []
+	for kill in killlist:
+		if int(kill['timestamp']) < start:
+			print "time"
+			continue
+		if kill['attacker_character_id'] == kill['character_id']:
+			print "suicide"
+			continue
+		if int(kill['attacker_weapon_id']) != int(weapon):
+			print "cont"
+			continue
+		print "Add"
+		all.append(kill)
+	od = sorted(all, key=lambda x: int(x['timestamp']), reverse=True)
+	print od
+	return render_template('weaponstats.html', total=od, cache=cache, cid=cid, start=start, weapon=weapon)
