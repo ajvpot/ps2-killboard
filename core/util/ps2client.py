@@ -9,11 +9,11 @@ class PS2RealTimeClientProtocol(WebSocketClientProtocol):
 	counter = 0
 
 	def onConnect(self, response):
-		print("Server connected: {0}".format(response.peer))
+		log.msg("Server connected: {0}".format(response.peer), system="census")
 
 	def onOpen(self):
 
-		print("WebSocket connection open.")
+		log.msg("WebSocket connection open.", system="census")
 
 		self.sendMessage(json.dumps({'service': 'event',
 									 'action': 'subscribe',
@@ -50,4 +50,4 @@ class PS2RealTimeClientProtocol(WebSocketClientProtocol):
 		#print payload['event_name']
 
 	def onClose(self, wasClean, code, reason):
-		print("WebSocket connection closed: {0}".format(reason))
+		log.msg("WebSocket connection closed: {0}".format(reason), system="census")

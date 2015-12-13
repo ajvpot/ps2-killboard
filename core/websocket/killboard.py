@@ -20,7 +20,6 @@ class KillboardState(State):
 		ws.write(json.dumps({'type': 'status', 'msg': '* Playback complete'}))
 
 	def onUpdate(self, ws, opcode, data, fin):
-		print data
 		self.transaction.sendUpdate(data)
 
 class KillboardTransaction(Transaction):
@@ -34,4 +33,4 @@ transactionManager = TransactionManager()
 
 killboardResource = WebSocketResource(transactionManager, 'subid') # subid is the get parameter
 
-print transactionManager.addTransaction(KillboardTransaction(KillboardState()), 'default')
+transactionManager.addTransaction(KillboardTransaction(KillboardState()), 'default')
