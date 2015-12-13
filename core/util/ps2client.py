@@ -1,6 +1,7 @@
 from autobahn.twisted.websocket import WebSocketClientProtocol
 import json
 from core import app
+import copy
 from twisted.python import log
 from core.ps2data import cache
 
@@ -44,7 +45,7 @@ class PS2RealTimeClientProtocol(WebSocketClientProtocol):
 		# TODO: Refactor messages into objects with fetch methods for things that need to be resolved
 
 		for x in self.factory.listeners.values():
-			x.onMessage(payload)
+			x.onMessage(copy.deepcopy(payload))
 
 		#print payload['event_name']
 

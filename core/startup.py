@@ -9,6 +9,7 @@ from core.listeners.kpm import KPMListener
 from core.listeners.loginresolver import LoginResolverListener
 from core.util.ps2client import PS2RealTimeClientProtocol
 from core.listeners.killboardlistener import KillboardListener
+from core.listeners.testlistener import TestListener
 from core.listeners.simpleevent import SimpleEventListener
 
 
@@ -34,6 +35,7 @@ def startup():
 		'simpleevent': SimpleEventListener(),
 		'loginresolver': LoginResolverListener(),
 		'killboardrouter': KillboardListener(),
+		'testlistener': TestListener(),
 	}
 	factory.protocol = PS2RealTimeClientProtocol
 

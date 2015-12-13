@@ -56,11 +56,6 @@ class ESFCounterListener(object):
 		return '%s,%s,%s,%s' % (int(time.time()), self.track['vs'].total(), self.track['tr'].total(), self.track['nc'].total())
 
 	def onMessage(self, payload):
-		ids = ['5428308138483718321', '5428392193625290673']
-
-		if(('character_id' in payload and payload['character_id'] in ids) or ('attacker_character_id' in payload and payload['attacker_character_id'] in ids)):
-			print 'DEBUG DEBUG LOL: %s' % (repr(payload))
-
 		if(payload['event_name'] == "VehicleDestroy"):
 			if(not payload['vehicle_id'] in esf_ids and not payload['attacker_vehicle_id'] in esf_ids):
 				return
