@@ -34,12 +34,12 @@
 						if(data['event_name'] == "Death"){
 							html = '<tr>';
 							if(data['attacker']['resolved']==true){
-								html += '<td class="'+data['attacker']['faction']+'">'+ data['attacker']['disp'] +'</td>';
+								html += '<td class="'+data['attacker']['faction']+'cell">'+ data['attacker']['disp'] +'</td>';
 							}else{
 								html += '<td class="loading">'+ data['attacker']['name'] +'</td>';
 							}
 							if(data['character']['resolved']==true){
-								html += '<td class="'+data['character']['faction']+'">'+ data['character']['disp'] +'</td>';
+								html += '<td class="'+data['character']['faction']+'cell">'+ data['character']['disp'] +'</td>';
 							}else{
 								html += '<td class="loading">'+ data['character']['name'] +'</td>';
 							}
@@ -53,11 +53,11 @@
 						if(data['event_name'] == "VehicleDestroy"){
 							html = '<tr>';
 							if(data['attacker']['resolved']==true){
-								html += '<td class="'+data['attacker']['faction']+'">'+ data['attacker']['disp'] +'</td>';
+								html += '<td class="'+data['attacker']['faction']+'cell">'+ data['attacker']['disp'] +'</td>';
 							}else{
 								html += '<td>'+ data['attacker']['name'] +'</td>';
 							}
-							html += '<td class="vehicle '+data['faction']+'">'+ data['vehicle'] +'</td>';
+							html += '<td class="vehicle '+data['faction']+'cell">'+ data['vehicle'] +'</td>';
 							html += '<td>'+ data['attacker_weapon'] +'</td></tr>';
 
 							$('#killfeed tr:nth-child(2)').before(html);
@@ -66,7 +66,7 @@
 					}else if(data['type'] == "resolve"){
 						$("td").filter(function() {
 							return $(this).text() == data['id'];
-						}).text(data['data']['disp']).addClass(data['data']['faction']).removeClass('loading');
+						}).text(data['data']['disp']).addClass(data['data']['faction']+'cell').removeClass('loading');
 					}else if(data['type'] == "status"){
 						html = '<tr>';
 						html += '<td colspan=3>';

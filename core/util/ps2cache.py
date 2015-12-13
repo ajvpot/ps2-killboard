@@ -150,9 +150,7 @@ class PS2Cache(object):
 				return self.cache[type][key]
 			else:
 				self.miss += 1
-
-				if(_debugging):
-					log.msg("CACHE MISS: [%s]%s" % (type, key), system="cache")
+				log.msg("CACHE MISS: [%s]%s" % (type, key), system="cache")
 
 				return "CACHE MISS: key(%s)" % key # ToDo: Fix this
 
