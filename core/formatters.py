@@ -8,7 +8,9 @@ def charactercell(char):
 	# takes a character cache result
 	if char['resolved'] == True:
 		t = Template("""
-		<td class="faction {{ char['faction'] }}" data-cid="{{ char['id'] }}"><a href="/player/{{ char['id'] }}">[{{ char['tag'] }}] {{ char['name'] }} ({{ char['br'] }})</a></td>
+		<td class="faction {{ char['faction'] }}cell" data-cid="{{ char['id'] }}"><a href="/player/{{ char['id'] }}">
+		{% if char['tag'] %}[{{ char['tag'] }}]{% endif %}
+		{{ char['name'] }} ({{ char['br'] }})</a></td>
 		""")
 		return Markup(t.render(char=char, url_for=url_for))
 	else:
@@ -24,7 +26,7 @@ def characterinline(char):
 	# takes a character cache result
 	if char['resolved'] == True:
 		t = Template("""
-		<span data-cid="{{ char['id'] }}"><a href="/player/{{ char['id'] }}">[{{ char['tag'] }}] {{ char['name'] }} ({{ char['br'] }})</a></td>
+		<span data-cid="{{ char['id'] }}"><a class="faction {{ char['faction']}}" href="/player/{{ char['id'] }}">[{{ char['tag'] }}] {{ char['name'] }} ({{ char['br'] }})</a></span>
 		""")
 		return Markup(t.render(char=char, url_for=url_for))
 	else:
